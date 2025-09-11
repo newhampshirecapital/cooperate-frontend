@@ -9,6 +9,7 @@ import {
   LogOut,
   Zap
 } from 'lucide-react';
+import { useAuth } from './context/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  //const { user, logout } = useAuth();
+  const { user, logout } = useAuth();
 
 //   if (!user || !user.isVerified || !user.cooperativeId) {
 //     return <>{children}</>;
@@ -35,7 +36,7 @@ export function Layout({ children }: LayoutProps) {
   };
 
   const handleLogout = () => {
-    //logout();
+    logout();
     navigate('/login');
   };
 
@@ -53,7 +54,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">Welcome, John Doe</span>
+              <span className="text-sm text-gray-600">Welcome {user?.name}</span>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout

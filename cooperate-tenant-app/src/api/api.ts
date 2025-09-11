@@ -1,6 +1,7 @@
 import {createApi,  fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import { config } from "../config";
-import type { RegisterPayload, VerifyOTPPayload, ResendOTPPayload, LoginPayload } from "../interface/auth";
+import type { RegisterPayload, VerifyOTPPayload, ResendOTPPayload, LoginPayload, ForgotPasswordPayload, ResetPasswordPayload } from "../interface/auth";
+import { secureTokenStorage } from "../lib/secureStorage";
 
 
 const baseUrl = config.backendUrl;
@@ -15,8 +16,8 @@ interface ApiResponse<T> {
 // Custom base query that handles token refresh
 const baseQueryWithRefresh = fetchBaseQuery({
     baseUrl,
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('token');
+    prepareHeaders: async (headers) => {
+      const token = await secureTokenStorage.getToken();
       if (token) {
         headers.set('authorization', `Bearer ${token}`);
       }
@@ -31,7 +32,7 @@ const baseQuery = async (args:any, api:any, extraOptions:any  ) => {
     
     // If the request failed with 401 (Unauthorized), try to refresh the token
     if (result.error && (result.error as any).status === 401) {
-      const refreshToken = localStorage.getItem('refreshToken');
+      const refreshToken = await secureTokenStorage.getRefreshToken();
       
       if (refreshToken) {
         // Try to refresh the token
@@ -46,18 +47,20 @@ const baseQuery = async (args:any, api:any, extraOptions:any  ) => {
         );
         
         if (refreshResult.data) {
-          // Token refresh successful, update localStorage
+          // Token refresh successful, update secure storage
           const { accessToken, refreshToken: newRefreshToken } = (refreshResult.data as any).data;
-          localStorage.setItem('token', accessToken);
-          localStorage.setItem('refreshToken', newRefreshToken);
+          const tokenExpiration = 24 * 60 * 60 * 1000; // 24 hours
+          await Promise.all([
+            secureTokenStorage.setToken(accessToken, tokenExpiration),
+            secureTokenStorage.setRefreshToken(newRefreshToken, tokenExpiration * 7)
+          ]);
           
           // Retry the original request with the new token
           const retryResult = await baseQueryWithRefresh(args, api, extraOptions);
           return retryResult;
         } else {
           // Token refresh failed, clear tokens and return original error
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
+          await secureTokenStorage.clearTokens();
           return result;
         }
       }
@@ -82,6 +85,7 @@ export const API = createApi({
     reducerPath: 'api',
     baseQuery,
     tagTypes: ['Auth', 'User', 'Cooperative', 'Product', 'Order', 'Payment'],
+    //authentication
     endpoints:(builder)=>({
         register:builder.mutation<ApiResponse<any>, RegisterPayload>({
             query:(payload)=>({
@@ -110,9 +114,24 @@ export const API = createApi({
                 method:'POST',
                 body:payload
             })
+        }),
+        forgotPassword:builder.mutation<ApiResponse<any>, ForgotPasswordPayload>({
+          query:(payload)=>({
+            url:'auth/forgot-password',
+            method:'POST',
+            body:payload
+
+          })
+        }),
+        resetPassword:builder.mutation<ApiResponse<any>, ResetPasswordPayload>({
+          query:(payload)=>({
+            url:'auth/reset-password',
+            method:'POST',
+            body:payload
+          })
         })
     })
 })
 
 
-export const { useRegisterMutation, useVerifyOTPMutation, useResendOTPMutation, useLoginMutation } = API;
+export const { useRegisterMutation, useVerifyOTPMutation, useResendOTPMutation, useLoginMutation, useForgotPasswordMutation, useResetPasswordMutation } = API;

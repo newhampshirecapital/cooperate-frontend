@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { VerifyOTPPage } from "./pages/auth/VerifyOTP";
 import ResendOtpPage from "./pages/auth/ResendOtpPage";
+import { ForgotPasswordPage } from "./pages/auth/ForgorPassword";
+import { ResetPasswordPage } from "./pages/auth/ResetPassword";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -32,7 +34,7 @@ export function AppContent() {
   const { user } = useAuth();
 
   // Define auth routes that don't require authentication
-  const authRoutes = ['/login', '/register', '/forgot-password', '/verify-otp', '/resendOtpPage'];
+  const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-otp', '/resendOtpPage'];
   const isAuthRoute = authRoutes.includes(location.pathname);
 
   // If user is not authenticated and not on auth pages, redirect to login
@@ -52,17 +54,8 @@ export function AppContent() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/verify-otp" element={<VerifyOTPPage />} />
       <Route path="/resendOtpPage" element={<ResendOtpPage />} />
-      <Route 
-        path="/forgot-password" 
-        element={
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-6">
-              <h1 className="text-2xl font-bold mb-4 text-center">Forgot Password</h1>
-              <p className="text-gray-600 text-center">Password reset functionality will be implemented here.</p>
-            </div>
-          </div>
-        } 
-      />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       
       {/* Protected Routes */}
       <Route 

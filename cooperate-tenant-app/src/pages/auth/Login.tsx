@@ -6,21 +6,19 @@ import { Label } from '../../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Zap, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useLoginMutation } from '../../api/api';
+import { useAuth } from '../../context/AuthContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loginMutation, { isLoading, error: loginError }] = useLoginMutation();
-  
-  const error = loginError as any;
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.log('Login attempt with email:', email);
+
     
     if (!email || !password) {
       toast.error('Please fill in all fields');
@@ -28,17 +26,18 @@ export function LoginPage() {
     }
 
     try {
-      console.log('Attempting to login...');
-      const result: any = await loginMutation({ email, password }).unwrap();
+      setIsLoading(true);
       
-      if (result?.success === true) {
-        toast.success('Login successful!');
-        console.log('Login result:', result);
-        navigate('/');
-      }
+      await login({ email, password });
+      
+      toast.success('Login successful!');
+      
+      navigate('/');
     } catch (error: any) {
       console.log('Login error:', error);
       toast.error(error?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,7 +66,6 @@ export function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
               />
-              {error && <p className="text-red-500">{error.message}</p>}
             </div>
             
             <div className="space-y-2">
@@ -91,7 +89,6 @@ export function LoginPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
               </div>
-              {error && <p className="text-red-500">{error.message}</p>}
             </div>
             
             <Button type="submit" className="w-full" disabled={isLoading}>

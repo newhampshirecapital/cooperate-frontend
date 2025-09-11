@@ -32,8 +32,6 @@ export function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submitted with data:', { email, password, name, phone });
-    
     if (!email || !password || !confirmPassword || !name || !phone) {
       toast.error('Please fill in all fields');
       return;
@@ -50,12 +48,11 @@ export function RegisterPage() {
     }
 
     try {
-      console.log('Attempting to register user...');
+    
       const result: any = await registerMutation({ email, password, name, phone }).unwrap();
       
       if (result?.success === true) {
         toast.success('Registration successful! Please verify your email.');
-        console.log('Registration result:', result);
         navigate('/verify-otp');
       }
     } catch (error: any) {
