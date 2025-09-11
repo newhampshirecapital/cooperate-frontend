@@ -1,5 +1,5 @@
 import React from 'react';
-//import { useAuth } from './AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from './components/ui/button';
 import { 
   Home, 
@@ -12,11 +12,11 @@ import {
 
 interface LayoutProps {
   children: React.ReactNode;
-  currentPage: string;
-  onPageChange: (page: string) => void;
 }
 
-export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
+export function Layout({ children }: LayoutProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   //const { user, logout } = useAuth();
 
 //   if (!user || !user.isVerified || !user.cooperativeId) {
@@ -24,11 +24,20 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
 //   }
 
   const navigationItems = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'transactions', label: 'Transactions', icon: History },
-    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'home', label: 'Home', icon: Home, path: '/' },
+    { id: 'transactions', label: 'Transactions', icon: History, path: '/transactions' },
+    { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
     //...(user.role === 'admin' ? [{ id: 'admin', label: 'Admin', icon: Settings }] : [])
   ];
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
+  const handleLogout = () => {
+    //logout();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -45,7 +54,7 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
             
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Welcome, John Doe</span>
-              <Button variant="ghost" size="sm" onClick={() => {}}>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
@@ -61,14 +70,14 @@ export function Layout({ children, currentPage, onPageChange }: LayoutProps) {
             <ul className="space-y-2">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentPage === item.id;
+                const isActive = location.pathname === item.path;
                 
                 return (
                   <li key={item.id}>
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       className={`w-full justify-start ${isActive ? 'bg-primary text-white' : 'text-gray-700 hover:bg-accent'}`}
-                      onClick={() => onPageChange(item.id)}
+                      onClick={() => handleNavigation(item.path)}
                     >
                       <Icon className="w-4 h-4 mr-3" />
                       {item.label}

@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-//import { useAuth } from '../AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Zap, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
+import { useLoginMutation } from '../../api/api';
 
-interface LoginPageProps {
-  onSwitchToRegister: () => void;
-  onSwitchToForgotPassword: () => void;
-}
-
-export function LoginPage({ onSwitchToRegister, onSwitchToForgotPassword }: LoginPageProps) {
+export function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  //const { login, loading } = useAuth();
+  const [loginMutation, { isLoading, error: loginError }] = useLoginMutation();
+  
+  const error = loginError as any;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log('Login attempt with email:', email);
     
     if (!email || !password) {
       toast.error('Please fill in all fields');
@@ -27,10 +28,17 @@ export function LoginPage({ onSwitchToRegister, onSwitchToForgotPassword }: Logi
     }
 
     try {
-      //await login(email, password);
-      toast.success('Login successful!');
-    } catch (error) {
-      toast.error('Login failed. Please try again.');
+      console.log('Attempting to login...');
+      const result: any = await loginMutation({ email, password }).unwrap();
+      
+      if (result?.success === true) {
+        toast.success('Login successful!');
+        console.log('Login result:', result);
+        navigate('/');
+      }
+    } catch (error: any) {
+      console.log('Login error:', error);
+      toast.error(error?.data?.message || 'Login failed. Please try again.');
     }
   };
 
@@ -56,9 +64,10 @@ export function LoginPage({ onSwitchToRegister, onSwitchToForgotPassword }: Logi
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e:any) => setEmail(e.target.value)}
-                //disabled={loading}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
+              {error && <p className="text-red-500">{error.message}</p>}
             </div>
             
             <div className="space-y-2">
@@ -69,8 +78,8 @@ export function LoginPage({ onSwitchToRegister, onSwitchToForgotPassword }: Logi
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={password}
-                  onChange={(e:any) => setPassword(e.target.value)}
-                  //disabled={loading}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
                 />
                 <Button
                   type="button"
@@ -82,33 +91,30 @@ export function LoginPage({ onSwitchToRegister, onSwitchToForgotPassword }: Logi
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
               </div>
+              {error && <p className="text-red-500">{error.message}</p>}
             </div>
             
-            <Button type="submit" className="w-full" //disabled={loading}
-            >
-              {/* {loading ? 'Signing in...' : 'Sign In'} */}
-              Sign In
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
           
           <div className="mt-6 text-center space-y-2">
-            <Button
-              variant="link"
-              onClick={onSwitchToForgotPassword}
+            <Link
+              to="/forgot-password"
               className="text-sm text-primary hover:underline"
             >
               Forgot your password?
-            </Button>
+            </Link>
             
             <div className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Button
-                variant="link"
-                onClick={onSwitchToRegister}
-                className="text-primary hover:underline p-0"
+              <Link
+                to="/register"
+                className="text-primary hover:underline"
               >
                 Sign up
-              </Button>
+              </Link>
             </div>
           </div>
         </CardContent>
