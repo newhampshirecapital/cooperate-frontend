@@ -27,3 +27,23 @@ export interface ResetPasswordPayload {
     password: string;
     token: string;
 }
+
+export interface UpdateUserPayload {
+    name: string;
+    email:string;
+    phone:string;
+    address?:Address;
+}
+
+export interface Address {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+   
+}
+
+export interface ChangePasswordPayload {
+    oldPassword: string;
+    newPassword: string;
+}

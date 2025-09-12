@@ -1,6 +1,6 @@
 import {createApi,  fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import { config } from "../config";
-import type { RegisterPayload, VerifyOTPPayload, ResendOTPPayload, LoginPayload, ForgotPasswordPayload, ResetPasswordPayload } from "../interface/auth";
+import type { RegisterPayload, VerifyOTPPayload, ResendOTPPayload, LoginPayload, ForgotPasswordPayload, ResetPasswordPayload, UpdateUserPayload, ChangePasswordPayload } from "../interface/auth";
 import { secureTokenStorage } from "../lib/secureStorage";
 
 
@@ -129,9 +129,31 @@ export const API = createApi({
             method:'POST',
             body:payload
           })
+        }),
+        changePassword:builder.mutation<ApiResponse<any>, { id: string; payload: ChangePasswordPayload }>({
+          query:({ id, payload })=>({
+            url:`user/change-password/${id}`,
+            method:'PUT',
+            body:payload
+          })
+        }),
+
+        //user management
+        getUser:builder.query<ApiResponse<any>, void>({
+          query:()=>({
+            url:'user/profile',
+            method:'GET'
+          })
+        }),
+        updateUser:builder.mutation<ApiResponse<any>, { id: string; payload: UpdateUserPayload }>({
+          query:({ id, payload })=>({
+            url:`user/update/${id}`,
+            method:'PUT',
+            body:payload
+          })
         })
     })
 })
 
 
-export const { useRegisterMutation, useVerifyOTPMutation, useResendOTPMutation, useLoginMutation, useForgotPasswordMutation, useResetPasswordMutation } = API;
+export const { useRegisterMutation, useVerifyOTPMutation, useResendOTPMutation, useLoginMutation, useForgotPasswordMutation, useResetPasswordMutation, useGetUserQuery, useUpdateUserMutation, useChangePasswordMutation } = API;

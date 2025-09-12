@@ -9,6 +9,8 @@ import { VerifyOTPPage } from "./pages/auth/VerifyOTP";
 import ResendOtpPage from "./pages/auth/ResendOtpPage";
 import { ForgotPasswordPage } from "./pages/auth/ForgorPassword";
 import { ResetPasswordPage } from "./pages/auth/ResetPassword";
+import { BillsPage } from "./pages/Bills";
+import { ProfilePage } from "./pages/Profile";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -82,16 +84,23 @@ export function AppContent() {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/bills" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <BillsPage />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
       
       <Route 
         path="/profile" 
         element={
           <ProtectedRoute>
             <Layout>
-              <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">Profile</h1>
-                <p className="text-gray-600">User profile information will be displayed here.</p>
-              </div>
+              <ProfilePage />
             </Layout>
           </ProtectedRoute>
         } 
