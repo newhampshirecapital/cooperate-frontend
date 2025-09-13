@@ -11,6 +11,7 @@ import { ForgotPasswordPage } from "./pages/auth/ForgorPassword";
 import { ResetPasswordPage } from "./pages/auth/ResetPassword";
 import { BillsPage } from "./pages/Bills";
 import { ProfilePage } from "./pages/Profile";
+import { ComplaintsPage } from "./pages/Complaints";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -105,7 +106,16 @@ export function AppContent() {
           </ProtectedRoute>
         } 
       />
-      
+      <Route 
+        path="/complaints" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ComplaintsPage />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
       {/* Add more protected routes here as needed */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

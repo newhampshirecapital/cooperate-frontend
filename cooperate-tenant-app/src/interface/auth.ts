@@ -47,3 +47,15 @@ export interface ChangePasswordPayload {
     oldPassword: string;
     newPassword: string;
 }
+
+export interface CreateComplaintPayload {
+    name: string;
+    cooperativeId: string;
+    userId: string;
+    message:string;
+    subject: string;
+    description: string;
+    category: string;
+    priority: string;
+    
+}
