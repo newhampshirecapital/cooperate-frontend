@@ -30,6 +30,7 @@ export interface User {
     role?: 'admin' | 'member';
     bio?: string;
     address: Address;
+    cooperateId?: string;
 }
 
 export function ProfilePage() {

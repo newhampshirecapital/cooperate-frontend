@@ -12,6 +12,9 @@ import { ResetPasswordPage } from "./pages/auth/ResetPassword";
 import { BillsPage } from "./pages/Bills";
 import { ProfilePage } from "./pages/Profile";
 import { ComplaintsPage } from "./pages/Complaints";
+import { MetersPage } from "./pages/Meters";
+import MembershipRequestPage from "./pages/auth/MembershipRequestPage";
+import CreateCooperative from "./pages/onboarding/CreateCooperative";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -37,16 +40,32 @@ export function AppContent() {
   const { user } = useAuth();
 
   // Define auth routes that don't require authentication
-  const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-otp', '/resendOtpPage'];
+  const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-otp', '/resendOtpPage', '/request-membership'];
   const isAuthRoute = authRoutes.includes(location.pathname);
+  const isCreateCooperativeRoute = location.pathname === '/create-cooperative';
 
-  // If user is not authenticated and not on auth pages, redirect to login
-  if (!user && !isAuthRoute) {
+  // If user is not authenticated and not on auth pages or create-cooperative, redirect to login
+  if (!user && !isAuthRoute && !isCreateCooperativeRoute) {
     return <Navigate to="/login" replace />;
   }
 
   // If user is authenticated and on auth pages, redirect to home
   if (user && isAuthRoute) {
+    return <Navigate to="/" replace />;
+  }
+
+  // If admin user doesn't have a cooperative and is not already on create-cooperative page, redirect to create cooperative page
+  if (user && user.role === 'admin' && !user.cooperativeId && !user.cooperateId && !isCreateCooperativeRoute) {
+    return <Navigate to="/create-cooperative" replace />;
+  }
+
+  // If non-admin user tries to access create-cooperative page, redirect to home
+  if (user && user.role !== 'admin' && isCreateCooperativeRoute) {
+    return <Navigate to="/" replace />;
+  }
+
+  // If admin with cooperative tries to access create-cooperative page, redirect to home
+  if (user && user.role === 'admin' && (user.cooperativeId || user.cooperateId) && isCreateCooperativeRoute) {
     return <Navigate to="/" replace />;
   }
 
@@ -59,6 +78,15 @@ export function AppContent() {
       <Route path="/resendOtpPage" element={<ResendOtpPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/request-membership" element={<MembershipRequestPage />} />
+      <Route 
+        path="/create-cooperative" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <CreateCooperative />
+          </ProtectedRoute>
+        } 
+      />
       
       {/* Protected Routes */}
       <Route 
@@ -112,6 +140,16 @@ export function AppContent() {
           <ProtectedRoute>
             <Layout>
               <ComplaintsPage />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/meters" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <MetersPage />
             </Layout>
           </ProtectedRoute>
         } 

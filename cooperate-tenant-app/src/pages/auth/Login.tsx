@@ -28,9 +28,13 @@ export function LoginPage() {
     try {
       setIsLoading(true);
       
-      await login({ email, password });
+    await login({ email, password });
       
       toast.success('Login successful!');
+      
+      // if(user.role === 'admin' && user.cooperativeId === null) {
+      //   navigate('/create-cooperative');
+      // }
       
       navigate('/');
     } catch (error: any) {
@@ -111,6 +115,15 @@ export function LoginPage() {
                 className="text-primary hover:underline"
               >
                 Sign up
+              </Link>
+            </div>
+            <div className="text-sm text-gray-600">
+              Not yet a member? request for membership{' '}
+              <Link
+                to="/request-membership"
+                className="text-primary hover:underline"
+              >
+                here
               </Link>
             </div>
           </div>

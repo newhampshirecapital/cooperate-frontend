@@ -10,6 +10,10 @@ import type {
   UpdateUserPayload,
   ChangePasswordPayload,
   CreateComplaintPayload,
+  MeterAccountApplicationPayload,
+  MeterApplicationRequestPayload,
+  UserMembershipRequestPayload,
+  CreateCooperativePayload,
 } from "../interface/auth";
 import { secureTokenStorage } from "../lib/secureStorage";
 
@@ -192,8 +196,75 @@ export const API = createApi({
         method: "GET",
       }),
     }),
-  }),
-});
+
+    //meters
+    meterAccountApplication: builder.mutation<ApiResponse<any>, MeterAccountApplicationPayload>({
+      query: (payload) => ({
+        url: "meter/account-application",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+    getUserMeterAccountApplications: builder.query<ApiResponse<any>, { id: string }>({
+      query: ({ id }) => ({
+        url: `meter/account-application/user/${id}`,
+        method: "GET",
+      }),
+    }),
+    getMeterApplicationById: builder.query<ApiResponse<any>, { id: string }>({
+      query: ({ id }) => ({
+        url: `meter/account-application/${id}`,
+        method: "GET",
+      }),
+    }),
+
+    //meter application requests
+    createMeterApplicationRequest: builder.mutation<ApiResponse<any>, MeterApplicationRequestPayload>({
+      query: (payload) => ({
+        url: "meter-application/create",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+    getUserMeterApplicationRequests: builder.query<ApiResponse<any>, { id: string }>({
+      query: ({ id }) => ({
+        url: `meter-application/user/${id}`,
+        method: "GET",
+      }),
+    }),
+    getMeterApplicationRequestById: builder.query<ApiResponse<any>, { id: string }>({
+      query: ({ id }) => ({
+        url: `meter-application/get/${id}`,
+        method: "GET",
+      }),
+    }),
+
+    //user membership requests
+    createUserMembershipRequest: builder.mutation<ApiResponse<any>, UserMembershipRequestPayload>({
+      query: (payload) => ({
+        url: "user/request-invite",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+
+    //cooperative management
+    createCooperative: builder.mutation<ApiResponse<any>, CreateCooperativePayload>({
+      query: (payload) => ({
+        url: "cooperative/create",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+    getUserCooperatives: builder.query<ApiResponse<any>, void>({
+        query: () => ({
+          url: `user/cooperative/me`,
+          method: "GET",
+        }),
+      }),
+    }),
+
+  });
 
 export const {
   useRegisterMutation,
@@ -208,4 +279,13 @@ export const {
   useCreateComplaintMutation,
   useGetComplaintsQuery,
   useGetComplaintByIdQuery,
+  useMeterAccountApplicationMutation,
+  useGetUserMeterAccountApplicationsQuery,
+  useGetMeterApplicationByIdQuery,
+  useCreateMeterApplicationRequestMutation,
+  useGetUserMeterApplicationRequestsQuery,
+  useGetMeterApplicationRequestByIdQuery,
+  useCreateUserMembershipRequestMutation,
+  useCreateCooperativeMutation,
+  useGetUserCooperativesQuery,
 } = API;

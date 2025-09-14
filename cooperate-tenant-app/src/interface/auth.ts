@@ -59,3 +59,97 @@ export interface CreateComplaintPayload {
     priority: string;
     
 }
+
+export interface MeterAccountApplicationPayload {
+    userId: string;
+    cooperativeId: string;
+    name:string;
+    email:string;
+    premiseUse:string;
+    electricityProvider:string;
+    lga:string;
+    houseOwner:boolean;
+    landlordName?:string;
+    landlordPhone?:string;
+    landlordAddress?:string;
+    address:Address;
+    phone:string;
+    typeofHouse:string;
+    typeofMeter:MeterType;
+    landMark?:string;
+    meansOfIdentification:string;
+    identificationNumber:string;
+    status:MeterAccountStatus;
+}
+
+export type MeterType = {
+    SINGLE_PHASE: 'SINGLE_PHASE',
+    THREE_PHASE: 'THREE_PHASE',
+  
+}
+
+export type MeterAccountStatus = {
+    PENDING: 'pending',
+    APPROVED: 'approved',
+    REJECTED: 'rejected',
+}
+
+export interface MeterApplicationRequestPayload {
+    name:string;
+    email:string;
+    phone:string;
+    address:Address;
+    nin:string;
+    userType:MeterApplicationUserType;
+    lga:string;
+    occupation:string;
+    accountName:string;
+    accountNumber:string;
+    accountPhoneNumber:string;
+    loadSeperation:boolean;
+   // loadCapacity:boolean;
+    tariffBand:TariffBand;
+    electricityBusinessUnit:string;
+    moreInfo?:string;
+    status:MeterApplicationStatus;
+    userId:string;
+    cooperativeId:string;
+}
+
+
+export type MeterApplicationUserType = {
+    LANDLORD: 'LANDLORD',
+    TENANT: 'TENANT',
+    OWNER: 'OWNER',
+}
+
+export type TariffBand = {
+    A: 'A',
+    B: 'B',
+    C: 'C',
+    D: 'D',
+    E: 'E',
+}
+
+export type MeterApplicationStatus = {
+    PENDING: 'PENDING',
+    APPROVED: 'APPROVED',
+    REJECTED: 'REJECTED',
+}
+
+export interface UserMembershipRequestPayload {
+    email:string;
+    phone:string;
+    name:string;
+    address:Address;
+    type:string;
+    occupation:string;
+    referralSource:string;
+}
+
+export interface CreateCooperativePayload {
+    name: string;
+    description: string;
+    address: Address;
+    adminId: string;
+}

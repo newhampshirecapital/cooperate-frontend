@@ -5,9 +5,20 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../..
 import { recentTransactions, stats } from '../../constants/stats';
 import { Battery, Sun, Wind, TrendingUp } from 'lucide-react';
 import { Progress } from '../../components/ui/progress';
+import { Navigate } from 'react-router-dom';
+import { useGetUserCooperativesQuery } from '../../api/api';
 
 const HomePage = () => {
   const { user,  isLoading } = useAuth();
+  const { data: cooperatives } = useGetUserCooperativesQuery();
+
+  const cooperativeName = cooperatives?.data?.name;
+
+
+  //check if cooperativeId is not null
+  if (user?.cooperateId === null) {
+    return <Navigate to="/request-membership" />;
+  }
 
   if (isLoading) {
     return (
@@ -25,6 +36,9 @@ const HomePage = () => {
             <h2 className="text-2xl font-semibold mb-2">
               Welcome back, {user?.name}!
             </h2>
+            <p className="text-blue-100">
+              {cooperativeName}
+            </p>
             <p className="text-blue-100">
               Here's your energy overview for today
             </p>

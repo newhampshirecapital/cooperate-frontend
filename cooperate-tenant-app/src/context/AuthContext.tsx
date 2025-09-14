@@ -11,6 +11,7 @@ interface User {
   phone: string;
   role: 'admin' | 'member';
   cooperativeId?: string;
+  cooperateId?: string; // Handle API typo
   isVerified: boolean;
   isBlocked: boolean;
   wallet: number;
@@ -26,6 +27,7 @@ interface AuthContextType {
   register: (payload: RegisterPayload) => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -40,7 +42,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
   const [registerMutation] = useRegisterMutation()
   const [loginMutation] = useLoginMutation();
 
@@ -116,11 +117,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setToken(accessToken);
       setRefreshToken(newRefreshToken);
       setUser({ ...userProfile });
+      
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
     }
   };
+
+ 
 
   const logout = async () => {
     try {
@@ -145,6 +149,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
     }
   };
+
+  const updateUser = async (updates: Partial<User>) => {
+    try {
+      if (!user) {
+        throw new Error('No user to update');
+      }
+
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      
+      // Update user data in secure storage
+      await secureStorage.setItem('user', JSON.stringify(updatedUser));
+      
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      throw error;
+    }
+  };
  
 
 
@@ -160,6 +182,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         register,
         login,
         logout,
+        updateUser,
         isLoading
       }}
     >
