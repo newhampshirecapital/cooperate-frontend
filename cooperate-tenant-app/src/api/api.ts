@@ -211,10 +211,23 @@ export const API = createApi({
         method: "GET",
       }),
     }),
-    getMeterApplicationById: builder.query<ApiResponse<any>, { id: string }>({
+    getMeterAccountApplicationById: builder.query<ApiResponse<any>, { id: string }>({
       query: ({ id }) => ({
         url: `meter/account-application/${id}`,
         method: "GET",
+      }),
+    }),
+    updateMeterAccountApplication: builder.mutation<ApiResponse<any>, { id: string; payload: MeterAccountApplicationPayload }>({
+      query: ({id, payload}) => ({
+        url: `meter/account-application/update/${id}`,
+        method: "PUT",
+        body: payload,
+      }),
+    }),
+    deleteMeterAccountApplication: builder.mutation<ApiResponse<any>, { id: string }>({
+      query: ({id}) => ({
+        url: `meter/account-application/delete/${id}`,
+        method: "DELETE",
       }),
     }),
 
@@ -236,6 +249,19 @@ export const API = createApi({
       query: ({ id }) => ({
         url: `meter-application/get/${id}`,
         method: "GET",
+      }),
+    }),
+    updateMeterApplicationRequest: builder.mutation<ApiResponse<any>, { id: string; payload: MeterApplicationRequestPayload }>({
+      query: ({id, payload}) => ({
+        url: `meter-application/update/${id}`,
+        method: "PUT",
+        body: payload,
+      }),
+    }),
+    deleteMeterApplicationRequest: builder.mutation<ApiResponse<any>, { id: string }>({
+      query: ({id}) => ({
+        url: `meter-application/delete/${id}`,
+        method: "DELETE",
       }),
     }),
 
@@ -281,11 +307,16 @@ export const {
   useGetComplaintByIdQuery,
   useMeterAccountApplicationMutation,
   useGetUserMeterAccountApplicationsQuery,
-  useGetMeterApplicationByIdQuery,
+  useGetMeterAccountApplicationByIdQuery,
+  useUpdateMeterAccountApplicationMutation,
   useCreateMeterApplicationRequestMutation,
   useGetUserMeterApplicationRequestsQuery,
   useGetMeterApplicationRequestByIdQuery,
+  useUpdateMeterApplicationRequestMutation,
+  useDeleteMeterAccountApplicationMutation,
+  useDeleteMeterApplicationRequestMutation,
   useCreateUserMembershipRequestMutation,
   useCreateCooperativeMutation,
   useGetUserCooperativesQuery,
+
 } = API;

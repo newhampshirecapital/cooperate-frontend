@@ -15,6 +15,7 @@ import { ComplaintsPage } from "./pages/Complaints";
 import { MetersPage } from "./pages/Meters";
 import MembershipRequestPage from "./pages/auth/MembershipRequestPage";
 import CreateCooperative from "./pages/onboarding/CreateCooperative";
+import { NotificationsPage } from "./pages/Notification";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -150,6 +151,16 @@ export function AppContent() {
           <ProtectedRoute>
             <Layout>
               <MetersPage />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/notifications" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <NotificationsPage />
             </Layout>
           </ProtectedRoute>
         } 

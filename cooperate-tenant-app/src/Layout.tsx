@@ -12,7 +12,8 @@ import {
   X,
   CreditCard,
   BellElectric,
-  MessageCircle
+  MessageCircle,
+  Bell
 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 
@@ -37,6 +38,7 @@ export function Layout({ children }: LayoutProps) {
     {id: 'bills', label: 'Bills & Payment', icon: CreditCard, path: '/bills' },
     {id: 'complaint', label: 'Complaints', icon: MessageCircle, path: '/complaints' },
     {id: 'meters', label: 'Meters', icon: BellElectric, path: '/meters' },
+    {id: 'notifications', label: 'Notifications', icon: Bell, path: '/notifications' },
    
     //...(user.role === 'admin' ? [{ id: 'admin', label: 'Admin', icon: Settings }] : [])
   ];
