@@ -145,6 +145,7 @@ export interface UserMembershipRequestPayload {
     type:string;
     occupation:string;
     referralSource:string;
+    cooperativeId:string;
 }
 
 export interface CreateCooperativePayload {

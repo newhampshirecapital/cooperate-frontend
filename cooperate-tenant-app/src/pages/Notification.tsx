@@ -16,78 +16,28 @@ import {
   Settings,
   AlertCircle,
   Info,
-  CheckCircle,
-  Zap,
   Receipt,
-  UserPlus,
   Clock
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
+import { useDeleteNotificationMutation, useGetUserNotificationsQuery, useReadAllNotificationsMutation, useMarkAsReadMutation } from '../api/api';
+import { NotificationIcons, NotificationColors } from '../constants/stats';
 
 export function NotificationsPage() {
   const [activeTab, setActiveTab] = useState('notifications');
+  const { user } = useAuth();
+  const { data: notificationsData, refetch } = useGetUserNotificationsQuery({ id: user?._id as string });
+  const [readAllNotificationsMutation] = useReadAllNotificationsMutation();
+  const [deleteNotificationMutation] = useDeleteNotificationMutation();
+ 
+  const notifications = notificationsData?.data || [];
   const [messageForm, setMessageForm] = useState({
     subject: '',
     message: ''
   });
 
-  const notifications = [
-    {
-      id: 'NOT001',
-      type: 'system',
-      title: 'System Maintenance Scheduled',
-      message: 'Our systems will undergo maintenance on January 20th from 2:00 AM to 4:00 AM. Services may be temporarily unavailable.',
-      timestamp: '2024-01-18 10:30',
-      read: false,
-      priority: 'high',
-      icon: AlertCircle,
-      color: 'text-orange-600'
-    },
-    {
-      id: 'NOT002',
-      type: 'billing',
-      title: 'Payment Successful',
-      message: 'Your electricity token purchase of ₦5,000 was successful. Token: 2847-5691-3829-4756',
-      timestamp: '2024-01-17 14:15',
-      read: true,
-      priority: 'normal',
-      icon: Receipt,
-      color: 'text-green-600'
-    },
-    {
-      id: 'NOT003',
-      type: 'meter',
-      title: 'New Meter Application Update',
-      message: 'Your meter application (APP001) has been approved. Installation will be scheduled within 5 business days.',
-      timestamp: '2024-01-16 09:20',
-      read: false,
-      priority: 'high',
-      icon: CheckCircle,
-      color: 'text-green-600'
-    },
-    {
-      id: 'NOT004',
-      type: 'energy',
-      title: 'Energy Trading Opportunity',
-      message: 'High demand detected in your area. Consider selling excess energy for premium rates.',
-      timestamp: '2024-01-15 16:45',
-      read: true,
-      priority: 'normal',
-      icon: Zap,
-      color: 'text-blue-600'
-    },
-    {
-      id: 'NOT005',
-      type: 'admin',
-      title: 'Welcome to EnergyCooperative!',
-      message: 'Welcome to our energy cooperative platform. Your account has been successfully verified and you can now start trading energy.',
-      timestamp: '2024-01-10 11:00',
-      read: true,
-      priority: 'normal',
-      icon: UserPlus,
-      color: 'text-purple-600'
-    }
-  ];
+  const [markAsReadMutation] = useMarkAsReadMutation();
 
   const messages = [
     {
@@ -135,12 +85,40 @@ export function NotificationsPage() {
     }, 1500);
   };
 
-  const markAsRead = (id: string) => {
-    toast.success('Marked as read');
+  const markAsRead = async (id: string) => {
+    const res = await markAsReadMutation({ id: id });
+    if (res.data) {
+      toast.success('Marked as read');
+      refetch();
+    } else {
+      toast.error('Failed to mark as read');
+    }
+
+   
   };
 
-  const deleteNotification = (id: string) => {
-    toast.success('Notification deleted');
+  const deleteNotification = async (id: string) => {
+    //alert the user
+    if (window.confirm('Are you sure you want to delete this notification?')) {
+    const res = await deleteNotificationMutation({ id: id });
+    if (res.data) {
+      toast.success('Notification deleted');
+      refetch();
+    } else {
+        toast.error('Failed to delete notification');
+      }
+    }
+    //toast.success('Notification deleted');
+  };
+
+  const readAllNotifications = async () => {
+    const res = await readAllNotificationsMutation({ id: user?._id as string });
+    if (res.data) {
+      toast.success('All notifications marked as read');
+      refetch();
+    } else {
+      toast.error('Failed to mark all notifications as read');
+    }
   };
 
   const getTypeColor = (type: string) => {
@@ -177,23 +155,26 @@ export function NotificationsPage() {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 h-auto">
+        <TabsList className="flex flex-col p-2 md:grid w-full md:grid-cols-3 h-auto ">
+          <TabsTrigger value="notifications" className="flex w-full items-center gap-2">
             <Bell className="w-4 h-4" />
             Notifications
             <Badge variant="secondary" className="ml-1 text-xs">
-              {notifications.filter(n => !n.read).length}
+              {notifications.filter((n:any) => !n.isRead).length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="messages" className="flex items-center gap-2">
+          <TabsTrigger value="messages" className="flex w-full items-center gap-2">
             <MessageSquare className="w-4 h-4" />
             Messages
             <Badge variant="secondary" className="ml-1 text-xs">
               {messages.filter(m => !m.read).length}
             </Badge>
           </TabsTrigger>
-          <TabsTrigger value="send-message">Send Message</TabsTrigger>
+          <TabsTrigger value="send-message" className="flex w-full items-center gap-2">
+            <Send className="w-4 h-4" />
+            Send Message
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="notifications" className="space-y-4">
@@ -205,38 +186,40 @@ export function NotificationsPage() {
                   System Notifications
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => readAllNotifications()}>
                     <Check className="w-4 h-4 mr-2" />
                     Mark All Read
                   </Button>
                 </div>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Important updates and system notifications
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {notifications.map((notification) => {
-                  const Icon = notification.icon;
+                {notifications.map((notification:any) => {
+                  // Get the appropriate icon and color based on notification type
+                  const Icon = NotificationIcons[notification.type as keyof typeof NotificationIcons] || NotificationIcons.default;
+                  const iconColor = NotificationColors[notification.type as keyof typeof NotificationColors] || NotificationColors.default;
                   return (
                     <div
-                      key={notification.id}
+                      key={notification._id}
                       className={`p-4 border rounded-lg transition-colors ${
-                        !notification.read ? 'bg-blue-50 border-blue-200' : 'bg-white'
+                        !notification.isRead ? 'bg-blue-50 border-blue-200' : 'bg-white'
                       } ${getPriorityBorder(notification.priority)}`}
                     >
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col md:flex-row items-start justify-between ">
                         <div className="flex items-start gap-3 flex-1">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            !notification.read ? 'bg-blue-100' : 'bg-gray-100'
+                            !notification.isRead ? 'bg-blue-100' : 'bg-gray-100'
                           }`}>
-                            <Icon className={`w-4 h-4 ${notification.color}`} />
+                            <Icon className={`w-4 h-4 ${iconColor}`} />
                           </div>
                           
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className={`font-medium ${!notification.read ? 'text-blue-900' : 'text-gray-900'}`}>
+                              <h4 className={`font-medium ${!notification.isRead ? 'text-blue-900' : 'text-gray-900'}`}>
                                 {notification.title}
                               </h4>
                               <Badge variant="outline" className={getTypeColor(notification.type)}>
@@ -253,27 +236,32 @@ export function NotificationsPage() {
                               {notification.message}
                             </p>
                             
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-xs mb-2 text-gray-500">
                               <Clock className="w-3 h-3" />
-                              {notification.timestamp}
+                              
+                              {notification.createdAt.toLocaleString().split('T')[0]} {notification.createdAt.toLocaleString().split('T')[1].split(':')[0]}:{notification.createdAt.toLocaleString().split('T')[1].split(':')[1]}
                             </div>
                           </div>
                         </div>
                         
                         <div className="flex items-center gap-1 ml-4">
-                          {!notification.read && (
+                          {!notification.isRead ? (
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => markAsRead(notification.id)}
+                              onClick={() => markAsRead(notification._id)}
                             >
                               <Check className="w-4 h-4" />
                             </Button>
+                          ) : (
+                            <Badge variant="outline" className="bg-green-100 mt-1 text-green-800 text-xs">
+                              Already Read
+                            </Badge>
                           )}
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => deleteNotification(notification.id)}
+                            onClick={() => deleteNotification(notification._id)}
                             className="text-red-600 hover:text-red-700"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -351,12 +339,12 @@ export function NotificationsPage() {
                         <Button variant="outline" size="sm">
                           Reply
                         </Button>
-                        {!message.read && (
-                          <Button variant="outline" size="sm" onClick={() => markAsRead(message.id)}>
+                        {/* {!message.read && (
+                          <Button variant="outline" size="sm" onClick={() => markAsRead()}>
                             <Check className="w-4 h-4 mr-2" />
                             Mark Read
                           </Button>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>

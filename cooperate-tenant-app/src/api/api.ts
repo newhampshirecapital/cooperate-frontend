@@ -290,12 +290,50 @@ export const API = createApi({
         }),
       }),
 
+      //get all cooperatives
+      getAllCooperative:builder.query<ApiResponse<any>, void>({
+        query: () => ({
+          url: "cooperative/all",
+          method: "GET",
+        }),
+      }),
+
       //admin management
       inviteUser: builder.mutation<ApiResponse<any>, InviteUserInput>({
         query: (payload) => ({
           url: "admin/invite",
           method: "POST",
           body: payload,
+        }),
+      }),
+
+
+      //NOTIFICATIONS
+      getUserNotifications:builder.query<ApiResponse<any>, { id: string }>({
+        query: ({ id }) => ({
+          url: `notification/user/${id}`,
+          method: "GET",
+        }),
+      }),
+
+      markAsRead:builder.mutation<ApiResponse<any>, { id: string }>({
+        query: ({ id }) => ({
+          url: `notification/${id}/read`,
+          method: "PUT",  
+        }),
+      }),
+
+      readAllNotifications:builder.mutation<ApiResponse<any>, { id: string }>({
+        query: ({ id }) => ({
+          url: `notification/user/${id}/read-all`,
+          method: "PUT",
+        }),
+      }),
+
+      deleteNotification:builder.mutation<ApiResponse<any>, { id: string }>({
+        query: ({ id }) => ({
+          url: `notification/${id}`,
+          method: "DELETE",
         }),
       }),
     }),
@@ -333,4 +371,11 @@ export const {
   useGetUserCooperativesQuery,
   //admin management
   useInviteUserMutation,
+  useGetAllCooperativeQuery,
+
+  //notifications
+  useGetUserNotificationsQuery,
+  useMarkAsReadMutation,
+  useReadAllNotificationsMutation,
+  useDeleteNotificationMutation,
 } = API;

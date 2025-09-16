@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -7,7 +7,7 @@ import { Label } from '../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { UserPlus, CheckCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useCreateUserMembershipRequestMutation } from '../../api/api';
+import { useCreateUserMembershipRequestMutation, useGetAllCooperativeQuery } from '../../api/api';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,18 @@ import {
 const MembershipRequestPage = () => {
   const [createUserMembershipRequest, { isLoading }] = useCreateUserMembershipRequestMutation();
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  
+  const { data: cooperativeQuery } = useGetAllCooperativeQuery();
+  console.log(cooperativeQuery);
+
+  const [allCooperatives, setAllCooperatives] = useState<any[]>([]);
+  console.log(allCooperatives);
+  console.log(cooperativeQuery?.data);
+
+  useEffect(() => {
+    if (cooperativeQuery?.data) {
+      setAllCooperatives(cooperativeQuery.data);
+    }
+  }, [cooperativeQuery?.data]);
   // Membership Request Form State
   const [membershipForm, setMembershipForm] = useState({
     name: '',
@@ -34,7 +45,8 @@ const MembershipRequestPage = () => {
     },
     type: '',
     occupation: '',
-    referralSource: ''
+    referralSource: '',
+    cooperativeId: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,7 +67,8 @@ const MembershipRequestPage = () => {
         address: membershipForm.address,
         type: membershipForm.type,
         occupation: membershipForm.occupation,
-        referralSource: membershipForm.referralSource
+        referralSource: membershipForm.referralSource,
+        cooperativeId: membershipForm.cooperativeId as string
       }).unwrap();
       
       toast.dismiss();
@@ -72,7 +85,8 @@ const MembershipRequestPage = () => {
         address: { street: '', city: '', state: '', country: 'Nigeria' },
         type: '',
         occupation: '',
-        referralSource: ''
+        referralSource: '',
+        cooperativeId: ''
       });
     } catch (error: any) {
       toast.dismiss();
@@ -186,6 +200,24 @@ const MembershipRequestPage = () => {
                     <SelectItem value="OTHER">Other</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cooperativeId">Select your choice cooperative from the dropdown</Label>
+                <Select
+                  value={membershipForm.cooperativeId}
+                  onValueChange={(value) => setMembershipForm({...membershipForm, cooperativeId: value})}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select cooperative" />
+                  </SelectTrigger>
+                  <SelectContent className='max-h-[200px] overflow-y-auto bg-gray-200'>
+                    {allCooperatives?.map((cooperative) => (
+                      <SelectItem key={cooperative._id} value={cooperative._id}>{cooperative.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
               </div>
               
               <Button type="submit" className="w-full cursor-pointer hover:bg-blue-900" disabled={isLoading}>

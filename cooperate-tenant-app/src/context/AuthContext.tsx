@@ -74,7 +74,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Clear any corrupted tokens
         await secureTokenStorage.clearTokens();
       } finally {
-        setIsLoading(false);
+        // Add a small delay to prevent flash of loading screen for very fast auth restoration
+        const minLoadingTime = 300; // 300ms minimum loading time
+        const startTime = Date.now();
+        
+        setTimeout(() => {
+          const elapsedTime = Date.now() - startTime;
+          if (elapsedTime >= minLoadingTime) {
+            setIsLoading(false);
+          } else {
+            setTimeout(() => setIsLoading(false), minLoadingTime - elapsedTime);
+          }
+        }, 0);
       }
     };
 

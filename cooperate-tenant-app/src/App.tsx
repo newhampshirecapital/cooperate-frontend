@@ -24,7 +24,12 @@ interface ProtectedRouteProps {
 }
 
 function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  
+  // Don't redirect while loading - let the parent component handle loading state
+  if (isLoading) {
+    return null;
+  }
   
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -39,12 +44,26 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
 
 export function AppContent() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
   // Define auth routes that don't require authentication
   const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-otp', '/resendOtpPage', '/request-membership'];
   const isAuthRoute = authRoutes.includes(location.pathname);
   const isCreateCooperativeRoute = location.pathname === '/create-cooperative';
+
+  // Show loading spinner while authentication state is being restored
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // If user is not authenticated and not on auth pages or create-cooperative, redirect to login
   if (!user && !isAuthRoute && !isCreateCooperativeRoute) {
