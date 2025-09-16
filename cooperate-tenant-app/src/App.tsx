@@ -16,6 +16,7 @@ import { MetersPage } from "./pages/Meters";
 import MembershipRequestPage from "./pages/auth/MembershipRequestPage";
 import CreateCooperative from "./pages/onboarding/CreateCooperative";
 import { NotificationsPage } from "./pages/Notification";
+import InviteUser from "./pages/Admin/InviteUser";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -88,6 +89,11 @@ export function AppContent() {
           </ProtectedRoute>
         } 
       />
+      <Route path="/invite" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <InviteUser />
+        </ProtectedRoute>
+      } />
       
       {/* Protected Routes */}
       <Route 

@@ -14,6 +14,7 @@ import type {
   MeterApplicationRequestPayload,
   UserMembershipRequestPayload,
   CreateCooperativePayload,
+  InviteUserInput,
 } from "../interface/auth";
 import { secureTokenStorage } from "../lib/secureStorage";
 
@@ -288,7 +289,19 @@ export const API = createApi({
           method: "GET",
         }),
       }),
+
+      //admin management
+      inviteUser: builder.mutation<ApiResponse<any>, InviteUserInput>({
+        query: (payload) => ({
+          url: "admin/invite",
+          method: "POST",
+          body: payload,
+        }),
+      }),
     }),
+
+
+    //admin management
 
   });
 
@@ -318,5 +331,6 @@ export const {
   useCreateUserMembershipRequestMutation,
   useCreateCooperativeMutation,
   useGetUserCooperativesQuery,
-
+  //admin management
+  useInviteUserMutation,
 } = API;

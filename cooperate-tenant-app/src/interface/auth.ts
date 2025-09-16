@@ -153,3 +153,18 @@ export interface CreateCooperativePayload {
     address: Address;
     adminId: string;
 }
+export interface InviteUserInput {
+    email:string;
+    role:UserRole;
+    name:string;
+    phone:string;
+    adminId:string;
+}
+
+export type UserRole = {
+    ADMIN: "admin",
+    VISITOR: "visitor",
+    VENDOR: "vendor",
+    SUPER_ADMIN: "super_admin",
+    MEMBER: "member",
+}
