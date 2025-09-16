@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from './components/ui/button';
+import { Badge } from './components/ui/badge';
+import { Footer } from './components/Footer';
 import { 
   Home, 
   History, 
@@ -14,9 +16,13 @@ import {
   BellElectric,
   MessageCircle,
   Bell,
-  UserPlus
+  UserPlus,
+  PersonStanding
+  
 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
+import { useGetAllpendingInvitesQuery } from './api/api';
+import NotificationTab from './components/ui/notification-tab';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -27,6 +33,10 @@ export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showNotification, setShowNotification] = useState(true);
+  const { data: pendingInvites } = useGetAllpendingInvitesQuery({id: user?.cooperateId || ''});
+
+  
 
 //   if (!user || !user.isVerified || !user.cooperativeId) {
 //     return <>{children}</>;
@@ -40,7 +50,8 @@ export function Layout({ children }: LayoutProps) {
     {id: 'complaint', label: 'Complaints', icon: MessageCircle, path: '/complaints' },
     {id: 'meters', label: 'Meters', icon: BellElectric, path: '/meters' },
     {id: 'notifications', label: 'Notifications', icon: Bell, path: '/notifications' },
-    ...(user?.role === 'admin' ? [{ id: 'invite', label: 'Invite', icon: UserPlus, path: '/invite' }] : [])
+    ...(user?.role === 'admin' ? [{ id: 'invite', label: 'Invite', icon: UserPlus, path: '/invite' }] : []),
+    ...(user?.role === 'admin' ? [{ id: 'pending invites', label: 'Pending Invites', icon: PersonStanding, path: '/pending-invites' }] : [])
   ];
 
   const handleNavigation = (path: string) => {
@@ -108,16 +119,23 @@ export function Layout({ children }: LayoutProps) {
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
+                const isPendingInvites = item.id === 'pending invites';
+                const inviteCount = pendingInvites?.data?.length || 0;
                 
                 return (
                   <li key={item.id}>
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       className={`w-full justify-start ${isActive ? 'bg-primary text-white' : 'text-gray-700 hover:bg-accent'}`}
-                      onClick={() => handleNavigation(item.path)}
+                      onClick={() => handleNavigation(item.path || '')}
                     >
                       <Icon className="w-4 h-4 mr-3" />
-                      {item.label}
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {isPendingInvites && inviteCount > 0 && (
+                        <Badge variant="destructive" className="ml-2 text-xs">
+                          {inviteCount}
+                        </Badge>
+                      )}
                     </Button>
                   </li>
                 );
@@ -131,6 +149,21 @@ export function Layout({ children }: LayoutProps) {
           </main>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
+      
+      {/* Animated Notification Tab */}
+      {pendingInvites && pendingInvites.data.length > 0 && showNotification && (
+        <NotificationTab
+          message="You have pending invites!"
+          count={pendingInvites.data.length}
+          onClose={() => setShowNotification(false)}
+          autoHide={true}
+          delay={3000}
+          duration={5000}
+        />
+      )}
     </div>
   );
 }

@@ -17,6 +17,12 @@ import MembershipRequestPage from "./pages/auth/MembershipRequestPage";
 import CreateCooperative from "./pages/onboarding/CreateCooperative";
 import { NotificationsPage } from "./pages/Notification";
 import InviteUser from "./pages/Admin/InviteUser";
+import PendingInvites from "./pages/Admin/pendingInvites";
+import AboutPage from "./pages/About";
+import FAQPage from "./pages/FAQ";
+import PrivacyPage from "./pages/Privacy";
+import SupportPage from "./pages/Support";
+import TermsPage from "./pages/Terms";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -100,17 +106,33 @@ export function AppContent() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/request-membership" element={<MembershipRequestPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/faq" element={<FAQPage />} />
+      <Route path="/support" element={<SupportPage />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route 
         path="/create-cooperative" 
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <CreateCooperative />
+            <Layout>
+              <CreateCooperative />
+            </Layout>
           </ProtectedRoute>
         } 
       />
       <Route path="/invite" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <InviteUser />
+          <Layout>
+            <InviteUser />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/pending-invites" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Layout>
+            <PendingInvites />
+          </Layout>
         </ProtectedRoute>
       } />
       

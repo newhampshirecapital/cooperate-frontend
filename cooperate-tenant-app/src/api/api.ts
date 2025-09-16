@@ -15,6 +15,9 @@ import type {
   UserMembershipRequestPayload,
   CreateCooperativePayload,
   InviteUserInput,
+  CreateUserMeterPayload,
+  UpdateUserInviteStatusPayload,
+  SendMessagePayload,
 } from "../interface/auth";
 import { secureTokenStorage } from "../lib/secureStorage";
 
@@ -336,6 +339,47 @@ export const API = createApi({
           method: "DELETE",
         }),
       }),
+
+      //user meter
+      createUserMeter:builder.mutation<ApiResponse<any>, CreateUserMeterPayload>({
+        query: (payload) => ({
+          url: "user-meter/create",
+          method: "POST",
+          body: payload,
+        }),
+      }),
+      getUserMeters:builder.query<ApiResponse<any>, { id: string }>({
+        query: ({ id }) => ({
+          url: `user-meter/user/${id}/all`,
+          method: "GET",
+        }),
+      }),
+
+      //admin
+      getAllpendingInvites:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `admin/all-pending-invites/${id}`,
+          method: "GET",
+        }),
+      }),
+      updateUserInviteStatus:builder.mutation<ApiResponse<any>, UpdateUserInviteStatusPayload>({
+        query: (payload) => ({
+          url: `admin/update-user-invite-status`,
+          method: "PUT",
+          body: payload,
+        }),
+      }),
+
+      //message
+      sendMessage:builder.mutation<ApiResponse<any>, SendMessagePayload>({
+        query: (payload) => ({
+          url: `message`,
+          method: "POST",
+          body: payload,
+        }),
+      })
+
+      
     }),
 
 
@@ -378,4 +422,15 @@ export const {
   useMarkAsReadMutation,
   useReadAllNotificationsMutation,
   useDeleteNotificationMutation,
+
+  //user meter
+  useCreateUserMeterMutation,
+  useGetUserMetersQuery,
+
+  //admin
+  useGetAllpendingInvitesQuery,
+  useUpdateUserInviteStatusMutation,
+
+  //message
+  useSendMessageMutation,
 } = API;

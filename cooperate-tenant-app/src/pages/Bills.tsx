@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -15,16 +15,31 @@ import {
   Wallet
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '../context/AuthContext';
+import { useGetUserMetersQuery } from '../api/api';
+import UserMeterForm from '../components/forms/UserMeterForm';
+import TariffRatesModal from '../components/modals/TariffRatesModal';
 
 export function BillsPage() {
   const [selectedMeter, setSelectedMeter] = useState('');
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [selectedElectricityCompany, setSelectedElectricityCompany] = useState('');
-  const meterAccounts = [
-    { id: '1', number: '20012345678', type: 'Prepaid', balance: '₦2,450.00', status: 'Active' },
-    { id: '2', number: '20087654321', type: 'Postpaid', balance: '₦0.00', status: 'Active' }
-  ];
+  const [meterData, setMeterData] = useState<any>(null)
+  const { user } = useAuth();
+
+  const userId = user?._id || '';
+  const {data: userMeters} = useGetUserMetersQuery({id: userId})
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isTariffModalOpen, setIsTariffModalOpen] = useState(false)
+  useEffect(() => {
+    if (userMeters) {
+      setMeterData(userMeters.data)
+    }
+  }, [userMeters])
+
+  
+ 
   const electricityCompanies = [
     { id: '1', name: 'Eko Electricity' },
     { id: '2', name: 'Ikeja Electricity' },
@@ -138,9 +153,9 @@ export function BillsPage() {
                       <SelectValue placeholder="Choose a meter account" />
                     </SelectTrigger>
                     <SelectContent>
-                      {meterAccounts.map((meter) => (
+                      {meterData?.map((meter:any) => (
                         <SelectItem key={meter.id} value={meter.id}>
-                          {meter.number} - {meter.type} (Balance: {meter.balance})
+                          {meter.meterNumber} - {meter.meterType === 'SINGLE_PHASE' ? 'Single Phase' : 'Three Phase'} (Balance: {meter.meterBalance})
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -288,20 +303,24 @@ export function BillsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {meterAccounts.map((meter) => (
+              {meterData?.map((meter:any) => (
                 <div key={meter.id} className="p-3 border rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{meter.number}</span>
-                    <Badge variant="secondary">{meter.status}</Badge>
+                    <span className="font-medium">{meter.meterNumber}</span>
+                    <Badge variant="secondary">Active</Badge>
                   </div>
                   <div className="text-sm text-gray-600">
-                    <p>Type: {meter.type}</p>
-                    <p>Balance: {meter.balance}</p>
+                    <p>Type: {meter.meterType === 'SINGLE_PHASE' ? 'Single Phase' : 'Three Phase'}</p>
+                    <p>Balance: {meter.meterBalance}</p>
                   </div>
                 </div>
-              ))}
+              )) || (
+                <div className="text-center text-gray-500 py-4">
+                  No meters found. Add a new meter to get started.
+                </div>
+              )}
               
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" onClick={() => setIsModalOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Meter
               </Button>
@@ -320,7 +339,7 @@ export function BillsPage() {
               <Button variant="outline" className="w-full justify-start">
                 Download Receipt
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => setIsTariffModalOpen(true)}>
                 View Tariff Rates
               </Button>
             </CardContent>
@@ -342,6 +361,15 @@ export function BillsPage() {
           </Card>
         </div>
       </div>
+      <UserMeterForm
+        userId={userId}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+      />
+      <TariffRatesModal
+        isOpen={isTariffModalOpen}
+        onClose={() => setIsTariffModalOpen(false)}
+      />
     </div>
   );
 }

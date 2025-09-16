@@ -17,12 +17,15 @@ import {
   AlertCircle,
   Info,
   Receipt,
-  Clock
+  Clock,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
-import { useDeleteNotificationMutation, useGetUserNotificationsQuery, useReadAllNotificationsMutation, useMarkAsReadMutation } from '../api/api';
+import { useDeleteNotificationMutation, useGetUserNotificationsQuery, useReadAllNotificationsMutation, useMarkAsReadMutation, useSendMessageMutation } from '../api/api';
 import { NotificationIcons, NotificationColors } from '../constants/stats';
+import type { MessageType } from '../interface/auth';
 
 export function NotificationsPage() {
   const [activeTab, setActiveTab] = useState('notifications');
@@ -30,12 +33,18 @@ export function NotificationsPage() {
   const { data: notificationsData, refetch } = useGetUserNotificationsQuery({ id: user?._id as string });
   const [readAllNotificationsMutation] = useReadAllNotificationsMutation();
   const [deleteNotificationMutation] = useDeleteNotificationMutation();
+  const [sendMessageMutation] = useSendMessageMutation();
  
   const notifications = notificationsData?.data || [];
   const [messageForm, setMessageForm] = useState({
     subject: '',
     message: ''
   });
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [messagesCurrentPage, setMessagesCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [markAsReadMutation] = useMarkAsReadMutation();
 
@@ -77,12 +86,21 @@ export function NotificationsPage() {
       return;
     }
 
-    toast.loading('Sending message...');
-    setTimeout(() => {
-      toast.dismiss();
+   
+    const res = await sendMessageMutation({
+      from: user?.email as string,
+      userId: user?._id as string,
+      subject: messageForm.subject,
+      message: messageForm.message,
+      messageType: "user_message" as unknown as MessageType,
+    });
+    if (res.data) {
       toast.success('Message sent to admin successfully!');
       setMessageForm({ subject: '', message: '' });
-    }, 1500);
+    } else {
+      toast.error('Failed to send message');
+    }
+   
   };
 
   const markAsRead = async (id: string) => {
@@ -142,6 +160,87 @@ export function NotificationsPage() {
     return priority === 'high' ? 'border-l-4 border-orange-400' : '';
   };
 
+  // Pagination logic
+  const getPaginatedData = (data: any[], page: number) => {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return data.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = (data: any[]) => {
+    return Math.ceil(data.length / itemsPerPage);
+  };
+
+  const paginatedNotifications = getPaginatedData(notifications, currentPage);
+  const paginatedMessages = getPaginatedData(messages, messagesCurrentPage);
+  const totalNotificationPages = getTotalPages(notifications);
+  const totalMessagePages = getTotalPages(messages);
+
+  // Reset to first page when switching tabs
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+    setMessagesCurrentPage(1);
+  };
+
+  // Pagination component
+  const PaginationControls = ({ 
+    currentPage, 
+    totalPages, 
+    onPageChange, 
+    dataLength 
+  }: {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+    dataLength: number;
+  }) => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex items-center justify-between mt-4 pt-4 border-t">
+        <div className="text-sm text-gray-600">
+          Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, dataLength)} of {dataLength} items
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </Button>
+          
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? "default" : "outline"}
+                size="sm"
+                onClick={() => onPageChange(page)}
+                className="w-8 h-8 p-0"
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -155,7 +254,7 @@ export function NotificationsPage() {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 h-auto">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 h-auto">
         <TabsList className="flex flex-col p-2 md:grid w-full md:grid-cols-3 h-auto ">
           <TabsTrigger value="notifications" className="flex w-full items-center gap-2">
             <Bell className="w-4 h-4" />
@@ -198,7 +297,7 @@ export function NotificationsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {notifications.map((notification:any) => {
+                {paginatedNotifications.map((notification:any) => {
                   // Get the appropriate icon and color based on notification type
                   const Icon = NotificationIcons[notification.type as keyof typeof NotificationIcons] || NotificationIcons.default;
                   const iconColor = NotificationColors[notification.type as keyof typeof NotificationColors] || NotificationColors.default;
@@ -272,6 +371,13 @@ export function NotificationsPage() {
                   );
                 })}
               </div>
+              
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalNotificationPages}
+                onPageChange={setCurrentPage}
+                dataLength={notifications.length}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -289,7 +395,7 @@ export function NotificationsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {messages.map((message) => (
+                {paginatedMessages.map((message) => (
                   <div
                     key={message.id}
                     className={`p-4 border rounded-lg ${
@@ -350,6 +456,13 @@ export function NotificationsPage() {
                   </div>
                 ))}
               </div>
+              
+              <PaginationControls
+                currentPage={messagesCurrentPage}
+                totalPages={totalMessagePages}
+                onPageChange={setMessagesCurrentPage}
+                dataLength={messages.length}
+              />
             </CardContent>
           </Card>
         </TabsContent>

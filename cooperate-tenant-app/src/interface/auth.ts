@@ -169,3 +169,43 @@ export type UserRole = {
     SUPER_ADMIN: "super_admin",
     MEMBER: "member",
 }
+
+export type MeterPhase = {
+    PREPAID: 'PREPAID',
+    POSTPAID: 'POSTPAID',
+}
+
+export interface CreateUserMeterPayload {
+    userId: string;
+    meterNumber: string;
+    meterType: MeterType;
+    meterPhase: MeterPhase;
+}
+
+export type UserInviteStatus = "PENDING" | "APPROVED" | "REJECTED"
+
+export interface UpdateUserInviteStatusPayload {
+    status: UserInviteStatus;
+    declineReason?: string;
+    adminId: string;
+    inviteId: string;
+}
+
+export interface SendMessagePayload {
+    from:string;
+    userId:string;
+    subject:string;
+    message:string;
+    messageType:MessageType;
+    cooperativeId?:string;
+}
+
+
+export type MessageType = {
+    ADMIN_MESSAGE: 'admin_message',
+    SUPPORT_REPLY: 'support_reply',
+    SYSTEM_ANNOUNCEMENT: 'system_announcement',
+    PAYMENT_NOTIFICATION: 'payment_notification',
+    GENERAL_MESSAGE: 'general_message',
+    USER_MESSAGE: 'user_message',
+}
