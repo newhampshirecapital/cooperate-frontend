@@ -28,9 +28,7 @@ const InviteUser = () => {
   // Role options
   const roleOptions = [
     { value: 'member', label: 'Member', description: 'Regular cooperative member' },
-    { value: 'admin', label: 'Admin', description: 'Administrative privileges' },
-    { value: 'vendor', label: 'Vendor', description: 'Vendor access' },
-    { value: 'visitor', label: 'Visitor', description: 'Limited access' }
+
   ];
 
   // Validation functions
