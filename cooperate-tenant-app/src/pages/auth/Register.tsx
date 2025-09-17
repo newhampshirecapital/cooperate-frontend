@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { useRegisterMutation } from '../../api/api';
+import { PinVerificationModal } from '../../components/modals/PinVerificationModal';
 
 
 
@@ -23,11 +24,30 @@ export function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registerMutation, { isLoading, error: registerError }] = useRegisterMutation();
   
+  // PIN verification states
+  const [isPinVerified, setIsPinVerified] = useState(false);
+  const [pinAttempts, setPinAttempts] = useState(0);
+  const [showPinModal, setShowPinModal] = useState(true);
+  const [isBlocked, setIsBlocked] = useState(false);
+  
   const error = registerError as any;
   
+  // PIN verification handlers
+  const handlePinSuccess = () => {
+    setIsPinVerified(true);
+    setShowPinModal(false);
+    toast.success('PIN verified! You can now register.');
+  };
 
-
-
+  const handleMaxAttemptsReached = () => {
+    setIsBlocked(true);
+    setShowPinModal(false);
+    toast.error('Maximum PIN attempts reached. Please contact support.');
+    // Redirect to support or show support contact info
+    setTimeout(() => {
+      navigate('/support');
+    }, 2000);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,18 +81,64 @@ export function RegisterPage() {
     }
   };
 
+  // Show blocked message if max attempts reached
+  if (isBlocked) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-8 h-8 text-white" />
+            </div>
+            <CardTitle className="text-red-600">Access Denied</CardTitle>
+            <CardDescription>
+              Maximum PIN verification attempts exceeded. Please contact support for assistance.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button 
+              onClick={() => navigate('/support')} 
+              className="w-full mb-4"
+            >
+              Contact Support
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/login')} 
+              className="w-full"
+            >
+              Back to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center mx-auto mb-4">
-            <Zap className="w-8 h-8 text-white" />
-          </div>
-          <CardTitle>Create Account</CardTitle>
-          <CardDescription>
-            Register as an admin to start your energy cooperative
-          </CardDescription>
-        </CardHeader>
+      {/* PIN Verification Modal */}
+      <PinVerificationModal
+        isOpen={showPinModal}
+        onSuccess={handlePinSuccess}
+        onMaxAttemptsReached={handleMaxAttemptsReached}
+        attempts={pinAttempts}
+        maxAttempts={3}
+        onAttemptUpdate={setPinAttempts}
+      />
+      
+      {/* Register Form - only show if PIN is verified */}
+      {isPinVerified && (
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-8 h-8 text-white" />
+            </div>
+            <CardTitle>Create Account</CardTitle>
+            <CardDescription>
+              Register as an admin to start your energy cooperative
+            </CardDescription>
+          </CardHeader>
         
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -182,7 +248,8 @@ export function RegisterPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      )}
     </div>
   );
 }

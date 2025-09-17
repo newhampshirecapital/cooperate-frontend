@@ -52,29 +52,29 @@ export function NotificationsPage() {
     {
       id: 'MSG001',
       from: 'admin',
-      subject: 'Response to Billing Inquiry',
-      message: 'Thank you for your inquiry about the billing discrepancy. We have reviewed your account and found that there was indeed an error in the calculation. A corrected bill has been generated and sent to your email. The difference of ₦1,200 has been credited to your account.',
-      timestamp: '2024-01-17 13:30',
+      subject: 'Welcome to Your Energy Cooperative Dashboard',
+      message: 'Welcome to your energy cooperative management system! This platform allows you to monitor your energy consumption, manage your account, and communicate with our administrative team. You can use the messaging system to ask questions, report issues, or request assistance. We\'re here to help you make the most of your renewable energy investment.',
+      timestamp: new Date().toLocaleString(),
       read: false,
-      type: 'response'
+      type: 'welcome'
     },
     {
       id: 'MSG002',
       from: 'admin',
-      subject: 'Meter Installation Update',
-      message: 'Your meter installation has been scheduled for January 22nd, 2024, between 9:00 AM and 12:00 PM. Our technician will contact you 30 minutes before arrival. Please ensure someone is available at the premises.',
-      timestamp: '2024-01-16 08:15',
+      subject: 'How to Use the Messaging System',
+      message: 'To send a message to our admin team, simply go to the "Send Message" tab and fill out the form with your subject and message. Please be specific about your inquiry and include any relevant details like meter numbers or dates. We typically respond within 24-48 hours during business days. For urgent matters, please contact our support hotline.',
+      timestamp: new Date().toLocaleString(),
       read: true,
-      type: 'update'
+      type: 'guide'
     },
     {
       id: 'MSG003',
       from: 'admin',
-      subject: 'Monthly Energy Report',
-      message: 'Your monthly energy report is now available. You generated 2,847 kWh and consumed 1,923 kWh this month, resulting in a net surplus of 924 kWh. Well done on your energy efficiency!',
-      timestamp: '2024-01-15 10:00',
+      subject: 'Getting Started with Your Account',
+      message: 'Your account is now fully set up! You can view your energy consumption data, check billing information, submit meter readings, and track your renewable energy generation. If you have any questions about using any features of the platform, don\'t hesitate to reach out through the messaging system. We\'re committed to helping you succeed with your energy cooperative membership.',
+      timestamp: new Date().toLocaleString(),
       read: true,
-      type: 'report'
+      type: 'info'
     }
   ];
 
