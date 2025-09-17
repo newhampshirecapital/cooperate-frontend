@@ -1,5 +1,5 @@
 export const config = {
-    backendUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5001/api/v1',
+    backendUrl: import.meta.env.VITE_BACKEND_URL || 'https://cooperative-tenant-1.onrender.com/api/v1',
     frontendUrl: import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173',
     localBackendUrl: import.meta.env.VITE_LOCAL_BACKEND_URL || 'http://localhost:5000/api/v1',
     backendLiveUrl: import.meta.env.VITE_BACKEND_LIVE_URL || 'https://kodekitchen-backend.onrender.com/api',
