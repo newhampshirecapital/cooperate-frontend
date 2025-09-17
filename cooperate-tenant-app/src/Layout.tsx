@@ -21,7 +21,7 @@ import {
   
 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
-import { useGetAllpendingInvitesQuery } from './api/api';
+import { useGetAllpendingInvitesQuery, useGetUserCooperativesQuery,  } from './api/api';
 import NotificationTab from './components/ui/notification-tab';
 
 interface LayoutProps {
@@ -35,6 +35,7 @@ export function Layout({ children }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(true);
   const { data: pendingInvites } = useGetAllpendingInvitesQuery({id: user?.cooperateId || ''});
+  const { data: cooperative } = useGetUserCooperativesQuery();
 
   
 
@@ -84,7 +85,7 @@ export function Layout({ children }: LayoutProps) {
               <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-xl font-semibold text-gray-900">EnergyCooperative</h1>
+              <h1 className="text-xl font-semibold text-gray-900">{cooperative?.data?.name}</h1>
             </div>
             
             <div className="flex items-center space-x-4">

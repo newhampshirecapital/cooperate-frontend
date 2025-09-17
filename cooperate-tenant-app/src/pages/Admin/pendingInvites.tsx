@@ -185,7 +185,7 @@ const PendingInvites = () => {
   }
 
   return (
-    <div className="space-y-6 m-3 ">
+    <div className="space-y-6 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -273,11 +273,11 @@ const PendingInvites = () => {
       </Card>
 
       {/* Invites List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-6">
         {filteredInvites.map((invite: PendingInvite) => (
           <Card key={invite._id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col md:flex-row items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                     <User className="w-6 h-6 text-white" />
@@ -287,7 +287,7 @@ const PendingInvites = () => {
                     <CardDescription>{invite.email}</CardDescription>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 my-2">
                   {getStatusBadge(invite.status)}
                   {getTypeBadge(invite.type)}
                 </div>
@@ -309,7 +309,7 @@ const PendingInvites = () => {
                   <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
     <div>
                     <div>{invite.address.street}</div>
-                    <div>{invite.address.city}, {invite.address.state}</div>
+                    <div>{invite.address.city} {invite.address.state}</div>
                     <div>{invite.address.country}</div>
                   </div>
                 </div>

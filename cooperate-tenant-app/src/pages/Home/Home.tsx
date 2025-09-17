@@ -22,7 +22,8 @@ import {
   MessageCircle,
   CreditCard,
   BellElectric,
-  FileText
+  FileText,
+  ZapIcon
 } from 'lucide-react';
 import { Progress } from '../../components/ui/progress';
 import { Navigate } from 'react-router-dom';
@@ -421,10 +422,10 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-green-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Leaf className="w-10 h-10 text-green-600" />
+                <ZapIcon className="w-10 h-10 text-green-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-900 mb-2">2,500+</h3>
-              <p className="text-gray-600">Tons of CO₂ Saved Annually</p>
+              <p className="text-gray-600">Energy solutions provided</p>
             </div>
             
             <div className="text-center">
