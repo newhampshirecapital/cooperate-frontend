@@ -21,11 +21,10 @@ const MembershipRequestPage = () => {
   const [createUserMembershipRequest, { isLoading }] = useCreateUserMembershipRequestMutation();
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const { data: cooperativeQuery } = useGetAllCooperativeQuery();
-  console.log(cooperativeQuery);
+
 
   const [allCooperatives, setAllCooperatives] = useState<any[]>([]);
-  console.log(allCooperatives);
-  console.log(cooperativeQuery?.data);
+
 
   useEffect(() => {
     if (cooperativeQuery?.data) {

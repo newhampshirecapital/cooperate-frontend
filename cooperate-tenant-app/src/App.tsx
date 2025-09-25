@@ -16,6 +16,7 @@ import { MetersPage } from "./pages/Meters";
 import MembershipRequestPage from "./pages/auth/MembershipRequestPage";
 import CreateCooperative from "./pages/onboarding/CreateCooperative";
 import { NotificationsPage } from "./pages/Notification";
+import { TransactionsPage } from "./pages/Transactions";
 import InviteUser from "./pages/Admin/InviteUser";
 import PendingInvites from "./pages/Admin/pendingInvites";
 import AboutPage from "./pages/About";
@@ -153,10 +154,7 @@ export function AppContent() {
         element={
           <ProtectedRoute>
             <Layout>
-              <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">Transactions</h1>
-                <p className="text-gray-600">Transaction history will be displayed here.</p>
-              </div>
+              <TransactionsPage />
             </Layout>
           </ProtectedRoute>
         } 
