@@ -24,6 +24,7 @@ import FAQPage from "./pages/FAQ";
 import PrivacyPage from "./pages/Privacy";
 import SupportPage from "./pages/Support";
 import TermsPage from "./pages/Terms";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -101,7 +102,7 @@ export function AppContent() {
     <Routes>
       {/* Auth Routes */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      {/* <Route path="/register" element={<RegisterPage />} /> */}
       <Route path="/verify-otp" element={<VerifyOTPPage />} />
       <Route path="/resendOtpPage" element={<ResendOtpPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -191,7 +192,7 @@ export function AppContent() {
         } 
       />
       <Route 
-        path="/meters" 
+        path="/applications" 
         element={
           <ProtectedRoute>
             <Layout>
@@ -200,6 +201,13 @@ export function AppContent() {
           </ProtectedRoute>
         } 
       />
+      <Route path="/admin-dashboard" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <Layout>
+            <AdminDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
       <Route 
         path="/notifications" 
         element={

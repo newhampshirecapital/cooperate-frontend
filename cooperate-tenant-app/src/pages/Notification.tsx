@@ -92,6 +92,7 @@ export function NotificationsPage() {
       userId: user?._id as string,
       subject: messageForm.subject,
       message: messageForm.message,
+      cooperativeId: user?.cooperateId as string,
       messageType: "user_message" as unknown as MessageType,
     });
     if (res.data) {

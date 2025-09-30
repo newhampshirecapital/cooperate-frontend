@@ -36,7 +36,7 @@ export function LoginPage() {
       //   navigate('/create-cooperative');
       // }
       
-      navigate('/');
+      //navigate('/');
     } catch (error: any) {
       console.log('Login error:', error);
       toast.error(error?.data?.message || 'Login failed. Please try again.');
@@ -108,7 +108,7 @@ export function LoginPage() {
               Forgot your password?
             </Link>
             
-            <div className="text-sm text-gray-600">
+            {/* <div className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link
                 to="/register"
@@ -116,7 +116,7 @@ export function LoginPage() {
               >
                 Sign up
               </Link>
-            </div>
+            </div> */}
             <div className="text-sm text-gray-600">
               Not yet a member? request for membership{' '}
               <Link

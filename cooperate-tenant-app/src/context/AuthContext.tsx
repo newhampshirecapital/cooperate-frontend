@@ -3,6 +3,7 @@ import type { LoginPayload, RegisterPayload } from '../interface/auth';
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
 import { secureTokenStorage, secureStorage } from '../lib/secureStorage';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   _id: string;
@@ -44,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [registerMutation] = useRegisterMutation()
   const [loginMutation] = useLoginMutation();
-
+  const navigate = useNavigate();
   // Initialize tokens from secure storage on mount
   useEffect(() => {
     const initializeAuth = async () => {
@@ -128,6 +129,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setToken(accessToken);
       setRefreshToken(newRefreshToken);
       setUser({ ...userProfile });
+
+     
+      if(userProfile.role === 'admin' && userProfile.cooperativeId === null) {
+        navigate('/create-cooperative');
+      }else if(userProfile.role === 'admin' && userProfile.cooperativeId !== null) {
+        navigate('/admin-dashboard');
+      }else{
+        navigate('/');
+      }
       
     } catch (error) {
       console.error('Login failed:', error);

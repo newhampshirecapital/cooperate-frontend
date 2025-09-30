@@ -17,7 +17,8 @@ import {
   MessageCircle,
   Bell,
   UserPlus,
-  PersonStanding
+  PersonStanding,
+  BarChart3
   
 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
@@ -35,7 +36,8 @@ export function Layout({ children }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(true);
   const { data: pendingInvites } = useGetAllpendingInvitesQuery({id: user?.cooperateId || ''});
-  const { data: cooperative } = useGetUserCooperativesQuery();
+  const { data: cooperative } = useGetUserCooperativesQuery({id: user?._id || ''});
+
 
   
 
@@ -47,11 +49,12 @@ export function Layout({ children }: LayoutProps) {
     { id: 'home', label: 'Home', icon: Home, path: '/' },
     { id: 'transactions', label: 'Transactions', icon: History, path: '/transactions' },
     { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
-    {id: 'bills', label: 'Bills & Payment', icon: CreditCard, path: '/bills' },
+    {id: 'bills', label: 'Buy Electricity Token', icon: CreditCard, path: '/bills' },
     {id: 'complaint', label: 'Complaints', icon: MessageCircle, path: '/complaints' },
-    {id: 'meters', label: 'Meters', icon: BellElectric, path: '/meters' },
-    {id: 'notifications', label: 'Notifications', icon: Bell, path: '/notifications' },
+    {id: 'applications', label: 'Applications', icon: BellElectric, path: '/applications' },
+    {id: 'notifications', label: 'Messages', icon: Bell, path: '/notifications' },
     ...(user?.role === 'admin' ? [{ id: 'invite', label: 'Invite', icon: UserPlus, path: '/invite' }] : []),
+    ...(user?.role === 'admin' ? [{ id: 'admin dashboard', label: 'Admin Dashboard', icon: BarChart3, path: '/admin-dashboard' }] : []),
     ...(user?.role === 'admin' ? [{ id: 'pending invites', label: 'Pending Invites', icon: PersonStanding, path: '/pending-invites' }] : [])
   ];
 

@@ -286,9 +286,9 @@ export const API = createApi({
         body: payload,
       }),
     }),
-    getUserCooperatives: builder.query<ApiResponse<any>, void>({
-        query: () => ({
-          url: `user/cooperative/me`,
+    getUserCooperatives: builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `user/cooperative/${id}`,
           method: "GET",
         }),
       }),
@@ -318,6 +318,20 @@ export const API = createApi({
           method: "GET",
         }),
       }),
+
+      getCooperativeNotifications:builder.query<ApiResponse<any>, { id: string }>({
+        query: ({ id }) => ({
+          url: `notification/cooperative/${id}`,
+          method: "GET",
+        }),
+      }),
+      getUnreadCooperativeNotifications:builder.query<ApiResponse<any>, { id: string }>({
+        query: ({ id }) => ({
+          url: `notification/cooperative/${id}/unread`,
+          method: "GET",
+        }),
+      }),
+      
 
       markAsRead:builder.mutation<ApiResponse<any>, { id: string }>({
         query: ({ id }) => ({
@@ -377,6 +391,26 @@ export const API = createApi({
           method: "POST",
           body: payload,
         }),
+      }),
+      getAllCooperativeMembers:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `admin/all-cooperative-members/${id}`,
+          method: "GET",
+        }),
+      }),
+      getAllCooperativeAdmins:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `admin/all-cooperative-admins/${id}`,
+          method: "GET",
+        }),
+      }),
+
+
+      //activity
+      getRecentActivity:builder.query<ApiResponse<any>, {id:string, days?:number, limit?:number}>({
+        query:({id, days = 7, limit = 100})=>({
+          url:`coop-log/${id}/recent?days=${days}&limit=${limit}`,
+        })
       })
 
       
@@ -384,6 +418,7 @@ export const API = createApi({
 
 
     //admin management
+  
 
   });
 
@@ -422,6 +457,8 @@ export const {
   useMarkAsReadMutation,
   useReadAllNotificationsMutation,
   useDeleteNotificationMutation,
+  useGetCooperativeNotificationsQuery,
+  useGetUnreadCooperativeNotificationsQuery,
 
   //user meter
   useCreateUserMeterMutation,
@@ -433,4 +470,12 @@ export const {
 
   //message
   useSendMessageMutation,
+
+  //admin
+  useGetAllCooperativeMembersQuery,
+  useGetAllCooperativeAdminsQuery,
+
+  //activity
+  useGetRecentActivityQuery,
+
 } = API;

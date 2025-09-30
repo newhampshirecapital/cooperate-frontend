@@ -93,7 +93,7 @@ const getWeeklyUsageData = (): WeeklyUsageData[] => {
 
 export default function HomePage() {
   const { user, isLoading } = useAuth();
-  const { data: cooperatives } = useGetUserCooperativesQuery();
+  const { data: cooperatives } = useGetUserCooperativesQuery({id: user?._id || ''});
   const { data: userMeters } = useGetUserMetersQuery({ id: user?._id || '' });
   const [isTariffModalOpen, setIsTariffModalOpen] = useState(false);
   const navigate = useNavigate();
