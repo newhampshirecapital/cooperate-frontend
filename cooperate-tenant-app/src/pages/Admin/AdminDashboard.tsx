@@ -23,12 +23,14 @@ import { NotificationIcons, NotificationColors } from '../../constants/stats';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import NotificationDetailModal from '../../components/modals/NotificationDetailModal';
+import ViewMembersModal from '../../components/modals/ViewMembersModal';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
   const {data: cooperativeMembers} = useGetAllCooperativeMembersQuery({id: user?.cooperativeId || user?.cooperateId as string});
   
   // Fetch recent activity
@@ -88,6 +90,14 @@ const AdminDashboard = () => {
   const closeNotificationDetail = () => {
     setSelectedNotification(null);
     setIsDetailModalOpen(false);
+  };
+
+  const openMembersModal = () => {
+    setShowMembersModal(true);
+  };
+
+  const closeMembersModal = () => {
+    setShowMembersModal(false);
   };
 
   const getNotificationIcon = (type: string) => {
@@ -164,7 +174,7 @@ const AdminDashboard = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            <div>
+    <div>
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
               <p className="text-gray-600 mt-2">
                 Welcome back, {user?.name || 'Admin'}
@@ -317,7 +327,7 @@ const AdminDashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={openMembersModal}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Members</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -325,7 +335,7 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalMembers}</div>
               <p className="text-xs text-muted-foreground">
-                +12% from last month
+                Click to view all members
               </p>
             </CardContent>
           </Card>
@@ -528,6 +538,13 @@ const AdminDashboard = () => {
         onClose={closeNotificationDetail}
         onMarkAsRead={handleMarkAsRead}
         onDelete={handleDeleteNotification}
+      />
+
+      {/* View Members Modal */}
+      <ViewMembersModal
+        members={cooperativeMembers?.data || []}
+        isOpen={showMembersModal}
+        onClose={closeMembersModal}
       />
     </div>
   );

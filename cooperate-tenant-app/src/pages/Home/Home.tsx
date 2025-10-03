@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -11,11 +11,23 @@ import {
   MessageCircle, 
   CreditCard, 
   BellElectric, 
-  FileText 
+  FileText,
+  Wallet,
+  Eye,
+  EyeOff,
+  TrendingUp,
+  Users,
+  ChevronRight,
+  CheckCircle,
+  Clock,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useGetUserCooperativesQuery, useGetUserMetersQuery } from '../../api/api';
+import { useGetUserCooperativesQuery, useGetUserMetersQuery, useGetVirtualAccountQuery, useGetWalletBalanceQuery } from '../../api/api';
 import TariffRatesModal from '../../components/modals/TariffRatesModal';
+import VirtualAccountModal from '../../components/VirtualAccountModal';
+import { VirtualAccountDetails } from '../../components/VirtualAccountSidebox';
 import bannerOne from '../../assets/banner1.png';
 
 interface Stat {
@@ -93,10 +105,40 @@ const getWeeklyUsageData = (): WeeklyUsageData[] => {
 
 export default function HomePage() {
   const { user, isLoading } = useAuth();
-  const { data: cooperatives } = useGetUserCooperativesQuery({id: user?._id || ''});
-  const { data: userMeters } = useGetUserMetersQuery({ id: user?._id || '' });
+  const userId = user?._id || '';
+  const { data: cooperatives } = useGetUserCooperativesQuery({id: userId});
+  const { data: userMeters } = useGetUserMetersQuery({ id: userId });
+  const { data: virtualAccount } = useGetVirtualAccountQuery({ id: userId });
+  
+  const { data: walletBalance } = useGetWalletBalanceQuery({ id: userId });
+  
   const [isTariffModalOpen, setIsTariffModalOpen] = useState(false);
+  const [showVirtualAccountSidebox, setShowVirtualAccountSidebox] = useState(false);
+  const [showBalance, setShowBalance] = useState(false);
+  const [showAccountDetails, setShowAccountDetails] = useState(false);
+  const [showFundConfirmationModal, setShowFundConfirmationModal] = useState(false);
   const navigate = useNavigate();
+
+  // Show modal with 3-second delay when virtual account is null
+  React.useEffect(() => {
+    if (!isLoading && virtualAccount?.data === null && user && userId) {
+      const timeoutId = setTimeout(() => {
+        setShowVirtualAccountSidebox(true);
+      }, 1000);
+      
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [isLoading, virtualAccount, user, userId]);
+
+  
+
+
+  // Check if user doesn't have a virtual account
+  const hasVirtualAccount = virtualAccount !== null && virtualAccount?.data;
+  
+ 
 
   const cooperativeName = cooperatives?.data?.name;
 
@@ -182,8 +224,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans antialiased">
+      {virtualAccount?.data === null && (
+        <p className="text-center p-1 text-gray-600">Please create your account to continue. <Button onClick={() => navigate('/create-virtual-account')} className="text-blue-200">Create Virtual Account</Button></p>
+      )}
       {/* Hero Section */}
       <div className="bg-white py-16 md:py-24">
+        
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Side: Text and Actions */}
@@ -226,8 +272,163 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Fintech Account Overview Section */}
+      <div className="bg-gray-50 py-8 -mt-16 md:-mt-24 z-10 relative">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Account Overview</h2>
+            <p className="text-gray-600">Manage your finances and contributions</p>
+          </div>
+          
+          {/* Horizontal Scrollable Cards */}
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {/* Wallet Balance Card */}
+            <div className="flex-shrink-0 w-80">
+              <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white border-0 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <Wallet className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-blue-100">Wallet Balance</h3>
+                        <p className="text-xs text-blue-200">Available funds</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-white/20 p-2"
+                      onClick={() => setShowBalance(!showBalance)}
+                    >
+                      {showBalance ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <p className="text-3xl font-bold">
+                      {showBalance ? (
+                        new Intl.NumberFormat('en-NG', {
+                          style: 'currency',
+                          currency: 'NGN',
+                        }).format(walletBalance?.data?.balance || 0)
+                      ) : (
+                        '••••••'
+                      )}
+                    </p>
+                    <p className="text-sm text-blue-200 mt-1">
+                      {showBalance ? 'Current balance' : 'Tap to reveal'}
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    className="w-full bg-white/20 hover:bg-white/30 text-white border-0"
+                    onClick={() => navigate('/transactions')}
+                  >
+                    View Transactions
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Fund Account Card */}
+            <div className="flex-shrink-0 w-80">
+              <Card className="bg-gradient-to-br from-green-600 to-green-700 text-white border-0 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <CreditCard className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-green-100">Fund Account</h3>
+                      <p className="text-xs text-green-200">Add money to wallet</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <p className="text-lg font-semibold mb-2">Quick Funding</p>
+                    <p className="text-sm text-green-200">
+                      Add funds instantly to your wallet
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    className="w-full bg-white/20 hover:bg-white/30 text-white border-0 mb-3"
+                    onClick={() => setShowAccountDetails(!showAccountDetails)}
+                  >
+                    {showAccountDetails ? 'Hide Details' : 'Show Account Details'}
+                  </Button>
+                  
+                  {showAccountDetails && virtualAccount?.data && (
+                    <div className="bg-white/10 rounded-lg p-3 mb-3">
+                      <p className="text-xs text-green-200 mb-1">Account Number</p>
+                      <p className="font-mono text-sm font-semibold">
+                        {virtualAccount.data.accountNumber}
+                      </p>
+                      <p className="text-xs text-green-200 mt-1">Bank: {virtualAccount.data.bankName}</p>
+                    </div>
+                  )}
+                  
+                  <Button 
+                    className="w-full bg-white/20 hover:bg-white/30 text-white border-0"
+                    onClick={() => setShowFundConfirmationModal(true)}
+                  >
+                    I have sent the money
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Cooperative Contribution Card */}
+            <div className="flex-shrink-0 w-80">
+              <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white border-0 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-purple-100">Transformer Funds</h3>
+                      <p className="text-xs text-purple-200">Current contribution</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <p className="text-2xl font-bold mb-1">
+                      ₦{((user?.wallet || 0) * 0.1).toLocaleString()}
+                    </p>
+                    <p className="text-sm text-purple-200">
+                      Monthly contribution
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <TrendingUp className="w-4 h-4 text-green-300" />
+                      <span className="text-xs text-green-300">+5% this month</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/10 rounded-lg p-3 mb-3">
+                    <p className="text-xs text-purple-200 mb-1">Cooperative</p>
+                    <p className="text-sm font-semibold">
+                      {cooperatives?.data?.name || 'EnergyCooperative'}
+                    </p>
+                    <p className="text-xs text-purple-200 mt-1">
+                      Member since {new Date(user?.createdAt || '').toLocaleDateString()}
+                    </p>
+                  </div>
+                  
+                 
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Energy Usage Tracking Section */}
-      <div className="container mx-auto px-6 py-12 -mt-16 md:-mt-24 z-10 relative">
+      <div className="container mx-auto px-6 py-12 z-10 relative">
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Track Your Energy Usage</h2>
           <p className="text-lg text-gray-600">Monitor your electricity consumption and spending patterns</p>
@@ -255,6 +456,17 @@ export default function HomePage() {
 
       {/* Main Content Sections */}
       <div className="container mx-auto px-6 py-12">
+        {/* Virtual Account Section - Show only if user has virtual account */}
+        {hasVirtualAccount && (
+          <div className="mb-8">
+            <VirtualAccountDetails 
+              user={user} 
+              virtualAccount={virtualAccount} 
+              walletBalance={walletBalance}
+            />
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Energy Activity */}
           <Card className="hover:shadow-xl transition-shadow">
@@ -405,6 +617,91 @@ export default function HomePage() {
         isOpen={isTariffModalOpen}
         onClose={() => setIsTariffModalOpen(false)}
       />
+      
+      {/* Virtual Account Modal - Show if user doesn't have virtual account */}
+      {showVirtualAccountSidebox && virtualAccount?.data === null && (
+        <VirtualAccountModal
+          user={user}
+          virtualAccount={virtualAccount}
+          onClose={() => setShowVirtualAccountSidebox(false)}
+        />
+      )}
+
+      {/* Fund Confirmation Modal */}
+      {showFundConfirmationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
+              <CardTitle className="text-xl text-gray-900">
+                Payment Confirmed
+              </CardTitle>
+              <CardDescription className="text-gray-600">
+                Thank you for your payment. We're processing your transaction.
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              {/* Status Information */}
+              <div className="bg-blue-50 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <Clock className="w-5 h-5 text-blue-600" />
+                  <h4 className="font-semibold text-blue-900">What happens next?</h4>
+                </div>
+                <ul className="space-y-2 text-sm text-blue-800">
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>You will receive a confirmation message shortly</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Your wallet balance will be updated within 24 hours</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>You can start using your funds immediately after update</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Contact Information */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-3">Need Help?</h4>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <p className="mb-2">If you experience any issues or have questions, please contact our admin team:</p>
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-gray-500" />
+                    <span>+234 800 123 4567</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-gray-500" />
+                    <span>support@energycooperative.com</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button 
+                  className="flex-1 bg-green-600 text-white hover:bg-green-700"
+                  onClick={() => setShowFundConfirmationModal(false)}
+                >
+                  Got it
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => navigate('/support')}
+                >
+                  Contact Support
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

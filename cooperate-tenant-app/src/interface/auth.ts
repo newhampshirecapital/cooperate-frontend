@@ -209,3 +209,12 @@ export type MessageType = {
     GENERAL_MESSAGE: 'general_message',
     USER_MESSAGE: 'user_message',
 }
+
+export interface CreateVirtualAccountPayload {
+    userId:string;
+    userName:string;
+    userEmail:string;
+    bvn:string;
+    nin:string;
+ 
+}

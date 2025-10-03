@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -101,12 +101,9 @@ export function LoginPage() {
           </form>
           
           <div className="mt-6 text-center space-y-2">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-primary hover:underline"
-            >
+            <Button onClick={() => navigate('/forgot-password')} className="text-sm text-primary hover:underline">
               Forgot your password?
-            </Link>
+            </Button>
             
             {/* <div className="text-sm text-gray-600">
               Don't have an account?{' '}
@@ -119,12 +116,9 @@ export function LoginPage() {
             </div> */}
             <div className="text-sm text-gray-600">
               Not yet a member? request for membership{' '}
-              <Link
-                to="/request-membership"
-                className="text-primary hover:underline"
-              >
+              <Button onClick={() => navigate('/request-membership')} className="text-primary hover:underline">
                 here
-              </Link>
+              </Button>
             </div>
           </div>
         </CardContent>

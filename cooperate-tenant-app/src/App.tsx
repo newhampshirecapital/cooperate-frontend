@@ -2,7 +2,6 @@ import { type ReactNode } from "react";
 import { Layout } from "./Layout"
 import HomePage from "./pages/Home/Home";
 import { LoginPage } from "./pages/auth/Login";
-import { RegisterPage } from "./pages/auth/Register";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import { VerifyOTPPage } from "./pages/auth/VerifyOTP";
@@ -25,6 +24,7 @@ import PrivacyPage from "./pages/Privacy";
 import SupportPage from "./pages/Support";
 import TermsPage from "./pages/Terms";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import CreateVirtualAccount from "./pages/virtual-account/CreateVirtualAccount";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -214,6 +214,16 @@ export function AppContent() {
           <ProtectedRoute>
             <Layout>
               <NotificationsPage />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/create-virtual-account" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <CreateVirtualAccount />
             </Layout>
           </ProtectedRoute>
         } 

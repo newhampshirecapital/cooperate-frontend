@@ -6,14 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { 
-   
   Clock, 
   User, 
-  
   Send,
   Eye,
   Trash2,
-  Forward
+  Forward,
+  Reply,
+  MessageSquare
 } from 'lucide-react';
 import { NotificationIcons, NotificationColors } from '../../constants/stats';
 import { toast } from 'sonner';
@@ -36,8 +36,13 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({
   const [showForwardModal, setShowForwardModal] = useState(false);
   const [forwardMessage, setForwardMessage] = useState('');
   const [isForwarding, setIsForwarding] = useState(false);
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [isReplying, setIsReplying] = useState(false);
 
   if (!notification) return null;
+
+  console.log(notification)
   
 
   const getNotificationIcon = (type: string) => {
@@ -111,6 +116,41 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({
            notification.type === 'complaint_updated';
   };
 
+  const isUserMessage = () => {
+    return notification.type === 'message_sent_to_admin' || 
+           notification.metadata?.messageType === 'user_message';
+  };
+
+  const handleReply = async () => {
+    if (!replyMessage.trim()) {
+      toast.error('Please enter a reply message');
+      return;
+    }
+
+    setIsReplying(true);
+    try {
+      // TODO: Implement API call to reply to message
+      // await replyToMessageMutation({
+      //   messageId: notification.metadata?.messageId,
+      //   reply: replyMessage,
+      //   adminId: user._id,
+      //   userId: notification.userId
+      // }).unwrap();
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast.success('Reply sent successfully');
+      setShowReplyModal(false);
+      setReplyMessage('');
+      onClose();
+    } catch (error) {
+      toast.error('Failed to send reply');
+    } finally {
+      setIsReplying(false);
+    }
+  };
+
   const Icon = getNotificationIcon(notification.type);
   const iconColor = getNotificationColor(notification.type);
 
@@ -127,7 +167,7 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({
 
           <div className="space-y-6">
             {/* Header Info */}
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col md:flex-row gap-3 items-start justify-between ">
               <div className="flex items-start gap-4">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                   !notification.isRead ? 'bg-blue-100' : 'bg-gray-100'
@@ -180,22 +220,64 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({
             {/* Message Content */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Message</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5" />
+                  {isUserMessage() ? 'User Message' : 'Message'}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {notification.message}
-                </p>
-               
-              </CardContent>
-              <CardContent>
-                <p className="text-red-700 font-bold leading-relaxed whitespace-pre-wrap">
-                  Category: {notification?.metadata?.category}
-                </p>
-                
-                <p className="text-gray-700 font-normal leading-relaxed whitespace-pre-wrap">
-                  Subject: {notification?.metadata?.subject}
-                </p>
+                {isUserMessage() ? (
+                  <div className="space-y-4">
+                    {/* User Message Details */}
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">From:</Label>
+                          <p className="font-medium">{notification.metadata?.senderName || 'Unknown'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Subject:</Label>
+                          <p className="font-medium">{notification.metadata?.subject || 'No Subject'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">Message ID:</Label>
+                          <p className="text-sm font-mono text-gray-600">{notification.metadata?.messageId}</p>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium text-gray-600">User ID:</Label>
+                          <p className="text-sm font-mono text-gray-600">{notification.userId}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Message Body */}
+                    <div>
+                      <Label className="text-sm font-medium text-gray-600">Message Body:</Label>
+                      <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                          {notification.metadata?.messageBody || notification.message}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {notification.message}
+                    </p>
+                    {notification?.metadata?.category && (
+                      <p className="text-gray-800 font-bold leading-relaxed whitespace-pre-wrap mt-2">
+                        Category: {notification?.metadata?.category}
+                      </p>
+                    )}
+                   
+                    {notification?.metadata?.subject && (
+                      <p className="text-gray-800 font-bold leading-relaxed whitespace-pre-wrap mt-2">
+                        Subject: {notification?.metadata?.subject}
+                      </p>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -259,6 +341,15 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({
             {/* Action Buttons */}
             <div className="flex items-center justify-between pt-4 border-t">
               <div className="flex items-center gap-2">
+                {isUserMessage() && (
+                  <Button
+                    onClick={() => setShowReplyModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Reply className="w-4 h-4 mr-2" />
+                    Reply
+                  </Button>
+                )}
                 {canForwardToNHC() && (
                   <Button
                     onClick={() => setShowForwardModal(true)}
@@ -338,6 +429,84 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({
                   <>
                     <Send className="w-4 h-4 mr-2" />
                     Forward to NHC
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reply Modal */}
+      <Dialog open={showReplyModal} onOpenChange={setShowReplyModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Reply className="w-5 h-5" />
+              Reply to Message
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium mb-2">Original Message:</h4>
+              <Card className="p-4 bg-gray-50">
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">
+                    <strong>From:</strong> {notification.metadata?.senderName || 'Unknown'}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Subject:</strong> {notification.metadata?.subject || 'No Subject'}
+                  </p>
+                  <p className="text-sm text-gray-700 mt-2">
+                    {notification.metadata?.messageBody || notification.message}
+                  </p>
+                </div>
+              </Card>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="reply-message">
+                Your Reply *
+              </Label>
+              <Textarea
+                id="reply-message"
+                placeholder="Type your reply here..."
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                rows={6}
+                className="resize-none"
+              />
+              <p className="text-xs text-gray-500">
+                Your reply will be sent directly to the user who sent this message.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowReplyModal(false);
+                  setReplyMessage('');
+                }}
+                disabled={isReplying}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleReply}
+                disabled={isReplying || !replyMessage.trim()}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {isReplying ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Reply
                   </>
                 )}
               </Button>

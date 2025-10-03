@@ -18,6 +18,7 @@ import type {
   CreateUserMeterPayload,
   UpdateUserInviteStatusPayload,
   SendMessagePayload,
+  CreateVirtualAccountPayload,
 } from "../interface/auth";
 import { secureTokenStorage } from "../lib/secureStorage";
 
@@ -411,7 +412,31 @@ export const API = createApi({
         query:({id, days = 7, limit = 100})=>({
           url:`coop-log/${id}/recent?days=${days}&limit=${limit}`,
         })
-      })
+      }),
+
+      //account
+      getVirtualAccount:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `virtual-account/get/${id}`,
+          method: "GET",
+        }),
+      }),
+      createVirtualAccount:builder.mutation<ApiResponse<any>, {payload:CreateVirtualAccountPayload}>({
+        query: ({payload}) => ({
+          url: `virtual-account/create`,
+          method: "POST",
+          body: payload,
+        }),
+      }),
+
+      //wallet
+      getWalletBalance:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `wallet/user/${id}/balance`,
+          method: "GET",
+        }),
+      }),
+     
 
       
     }),
@@ -477,5 +502,12 @@ export const {
 
   //activity
   useGetRecentActivityQuery,
+
+  //account
+  useGetVirtualAccountQuery,
+  useCreateVirtualAccountMutation,
+
+  //wallet
+  useGetWalletBalanceQuery,
 
 } = API;
