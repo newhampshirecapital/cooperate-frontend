@@ -98,7 +98,7 @@ const SavingsTargetDetails = () => {
     refetch: refetchPayments 
   } = useGetSavingsTargetPaymentQuery({ id: id! });
 
-  console.log('paymentData', paymentData);
+ 
 
   const { 
     data: statsData, 

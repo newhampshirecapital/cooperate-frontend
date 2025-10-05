@@ -45,16 +45,16 @@ export function VerifyOTPPage() {
     }
 
     try {
-      console.log('Attempting to verify OTP...');
+      
       const result: any = await verifyOTP({ otp: otpString }).unwrap();
       
       if (result?.success === true) {
         toast.success('Email verified successfully!');
-        console.log('OTP verification result:', result);
+        
         navigate('/login');
       }
     } catch (error: any) {
-      console.log('OTP verification error:', error);
+      
       toast.error(error?.data?.message || 'Invalid OTP. Please try again.');
     }
   };

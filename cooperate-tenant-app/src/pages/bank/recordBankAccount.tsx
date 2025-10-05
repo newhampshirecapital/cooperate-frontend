@@ -29,7 +29,7 @@ interface FormData {
 
 const RecordCooperativeAccount = () => {
   const { user } = useAuth();
-  console.log(user);
+
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState<FormData>({

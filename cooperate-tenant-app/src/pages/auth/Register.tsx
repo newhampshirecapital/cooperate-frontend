@@ -77,7 +77,7 @@ export function RegisterPage() {
         navigate('/verify-otp');
       }
     } catch (error: any) {
-      console.log('Registration error:', error);
+
       toast.error(error?.data?.message || 'Registration failed. Please try again.');
     }
   };

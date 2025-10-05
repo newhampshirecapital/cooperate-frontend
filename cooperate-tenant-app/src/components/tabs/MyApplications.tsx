@@ -105,7 +105,7 @@ const MyApplications: React.FC<MyApplicationsProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            console.log('Edit button clicked for meter-account:', app._id);
+                          
                             onEditApplication(app._id, 'meter-account');
                           }}
                         >
@@ -200,7 +200,7 @@ const MyApplications: React.FC<MyApplicationsProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            console.log('Edit button clicked for new-meter:', app._id);
+                         
                             onEditApplication(app._id, 'new-meter');
                           }}
                         >

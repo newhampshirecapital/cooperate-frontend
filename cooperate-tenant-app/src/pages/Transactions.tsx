@@ -43,8 +43,6 @@ export function TransactionsPage() {
     skip: !selectedTransactionId // Only fetch when a transaction is selected
   });
 
-  console.log('transactionData', transactionData);
-  console.log('transactionDetails', transactionDetails);
   
   const transactions: any = transactionData || [];
 

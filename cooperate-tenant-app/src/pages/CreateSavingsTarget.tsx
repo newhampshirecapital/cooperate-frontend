@@ -78,7 +78,7 @@ const CreateSavingsTarget = () => {
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
-    console.log(`Input change - Field: ${field}, Value: "${value}"`);
+   
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error when user starts typing
@@ -113,9 +113,6 @@ const CreateSavingsTarget = () => {
         targetDate: new Date(formData.targetDate)
       };
 
-      console.log('Form Data:', formData);
-      console.log('Payload being sent:', payload);
-      console.log('Target Amount:', formData.targetAmount, '->', Number(formData.targetAmount));
 
       await createTarget({ payload }).unwrap();
       

@@ -12,12 +12,11 @@ interface VirtualAccountModalProps {
 }
 
 const VirtualAccountModal: React.FC<VirtualAccountModalProps> = ({ 
-  virtualAccount, 
   onClose 
 }) => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
-  console.log('virtualAccount in the modal', virtualAccount);
+  
 
   const handleCreateVirtualAccount = () => {
     // Navigate to virtual account creation page

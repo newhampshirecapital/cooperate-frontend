@@ -38,7 +38,7 @@ export function LoginPage() {
       
       //navigate('/');
     } catch (error: any) {
-      console.log('Login error:', error);
+     
       toast.error(error?.data?.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);

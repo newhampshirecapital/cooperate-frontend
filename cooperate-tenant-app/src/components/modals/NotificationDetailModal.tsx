@@ -42,7 +42,7 @@ const NotificationDetailModal: React.FC<NotificationDetailModalProps> = ({
 
   if (!notification) return null;
 
-  console.log(notification)
+
   
 
   const getNotificationIcon = (type: string) => {

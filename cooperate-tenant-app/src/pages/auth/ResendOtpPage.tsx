@@ -36,11 +36,11 @@ export function ResendOTPPage() {
       
       if (result?.success === true) {
         toast.success('OTP sent successfully! Please check your email.');
-        console.log('Resend OTP result:', result);
+      
         navigate('/verify-otp');
       }
     } catch (error: any) {
-      console.log('Resend OTP error:', error);
+     
       toast.error(error?.data?.message || 'Failed to send OTP. Please try again.');
     }
   };
