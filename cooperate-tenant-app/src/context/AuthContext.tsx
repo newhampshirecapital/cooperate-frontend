@@ -8,7 +8,9 @@ import { useNavigate } from 'react-router-dom';
 interface User {
   _id: string;
   email: string;
-  name: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   role: 'admin' | 'member';
   cooperativeId?: string;

@@ -1,5 +1,6 @@
 export interface RegisterPayload {
-    name:string;
+    firstName:string;
+    lastName:string;
     email: string;
     password: string;
     phone: string;
@@ -29,7 +30,9 @@ export interface ResetPasswordPayload {
 }
 
 export interface UpdateUserPayload {
-    name: string;
+    firstName:string;
+    lastName:string;
+    fullName:string;
     email:string;
     phone:string;
     address?:Address;
@@ -157,7 +160,8 @@ export interface CreateCooperativePayload {
 export interface InviteUserInput {
     email:string;
     role:UserRole;
-    name:string;
+    firstName:string;
+    lastName:string;
     phone:string;
     adminId:string;
 }
@@ -217,4 +221,40 @@ export interface CreateVirtualAccountPayload {
     bvn:string;
     nin:string;
  
+}
+
+export interface RecordCooperativeAccountPayload {
+    cooperateId:string;
+    accountNumber:string;
+    accountName:string;
+    bankName:string;
+    userId:string;
+}
+
+export interface CreateSavingsTargetPayload {
+    userId: string;
+    cooperativeId: string;
+    targetName: string;
+    targetDescription?: string;
+    targetAmount: number;
+    targetType: SavingsTargetType;
+    targetDate?: Date;
+}
+
+export type SavingsTargetType = {
+    MONTHLY: 'monthly',
+    QUARTERLY: 'quarterly',
+    YEARLY: 'yearly'
+}
+
+export interface ContributeToSavingsTargetPayload {
+    amount: string;
+    cooperativeId: string;
+    narration: string;
+    savingsTargetId: string;
+}
+
+export interface CancelSavingsTargetPayload {
+    savingsTargetId: string;
+    userId: string;
 }

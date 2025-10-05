@@ -25,6 +25,15 @@ import SupportPage from "./pages/Support";
 import TermsPage from "./pages/Terms";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import CreateVirtualAccount from "./pages/virtual-account/CreateVirtualAccount";
+import RecordCooperativeAccount from "./pages/bank/recordBankAccount";
+import CreateSavingsTarget from "./pages/CreateSavingsTarget";
+import AllActivities from "./pages/AllActivities";
+import ContributionPayment from "./pages/ContributionPayment";
+import {RegisterPage} from "./pages/auth/Register";
+import SavingsTargetPage from "./pages/SavingsTarget";
+import SavingsTargetDetails from "./pages/SavingsTargetDetails";
+import UserContributionsPage from "./pages/UserContributions";
+import AdminContributionsPage from "./pages/Admin/AdminContributions";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -102,7 +111,7 @@ export function AppContent() {
     <Routes>
       {/* Auth Routes */}
       <Route path="/login" element={<LoginPage />} />
-      {/* <Route path="/register" element={<RegisterPage />} /> */}
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/verify-otp" element={<VerifyOTPPage />} />
       <Route path="/resendOtpPage" element={<ResendOtpPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -224,6 +233,96 @@ export function AppContent() {
           <ProtectedRoute>
             <Layout>
               <CreateVirtualAccount />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/create-cooperative-account" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <RecordCooperativeAccount />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/record-cooperative-account" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <RecordCooperativeAccount />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/create-savings-target" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <CreateSavingsTarget />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/all-activities" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <AllActivities />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/contribute/:targetId" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ContributionPayment />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/savings-targets" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <SavingsTargetPage />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/savings-target/:id" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <SavingsTargetDetails />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/my-contributions" 
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <UserContributionsPage />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin-contributions" 
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout>
+              <AdminContributionsPage />
             </Layout>
           </ProtectedRoute>
         } 

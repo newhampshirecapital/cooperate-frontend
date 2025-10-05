@@ -48,7 +48,7 @@ export function ComplaintsPage() {
   const [complaintForm, setComplaintForm] = useState({
     userId: userId,
     cooperativeId: cooperativeId || '',
-    name: user?.name || '',
+    name: user?.fullName || '',
     phone:userPhone || '',
     message: '',
     subject: '',
@@ -86,7 +86,7 @@ export function ComplaintsPage() {
         userId: userId,
         phone:userPhone,
         cooperativeId: cooperativeId || '',
-        name: user?.name || '',
+        name: user?.fullName || '',
         message: '',
       });
       // Refetch complaints to show the new complaint

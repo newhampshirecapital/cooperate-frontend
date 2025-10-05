@@ -10,37 +10,33 @@ import {
   FileText,
   BarChart3,
   UserPlus,
-  Activity,
   Clock,
   Eye,
   Trash2,
-  CheckCircle
+  CheckCircle,
+  Banknote,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { useGetCooperativeNotificationsQuery, useGetUnreadCooperativeNotificationsQuery, useMarkAsReadMutation, useDeleteNotificationMutation, useGetAllCooperativeMembersQuery, useGetRecentActivityQuery } from '../../api/api';
+import { useGetCooperativeNotificationsQuery, useGetUnreadCooperativeNotificationsQuery, useMarkAsReadMutation, useDeleteNotificationMutation, useGetAllCooperativeMembersQuery, useGetCooperativeAccountQuery } from '../../api/api';
 import { NotificationIcons, NotificationColors } from '../../constants/stats';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import NotificationDetailModal from '../../components/modals/NotificationDetailModal';
 import ViewMembersModal from '../../components/modals/ViewMembersModal';
+import ContributionSection from '../../components/ContributionSection';
+import RecentActivity from '../../components/RecentActivity';
+
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
   const {data: cooperativeMembers} = useGetAllCooperativeMembersQuery({id: user?.cooperativeId || user?.cooperateId as string});
-  
-  // Fetch recent activity
-  const {data: recentActivityData} = useGetRecentActivityQuery({
-    id: user?.cooperativeId || user?.cooperateId as string,
-    days: 7,
-    limit: 10
-  });
-
- 
+  const {data: cooperativeAccount} = useGetCooperativeAccountQuery({id: user?.cooperateId as string});
   
   // Fetch notifications for the cooperative
   const { data: notificationsData, refetch: refetchNotifications } = useGetCooperativeNotificationsQuery({ 
@@ -142,30 +138,12 @@ const AdminDashboard = () => {
   const accountApplications = notifications.filter((account:any) => account.type === 'meter_account_request_submitted_to_admin').length;
   const messages = notifications.filter((message:any) => message.type === 'message_sent_to_admin').length;
   
-  // Use real activity data or fallback to mock data
-  const recentActivities = recentActivityData?.data || [
-    { id: 1, type: 'member', action: 'New member registered', time: '2 hours ago', user: 'John Doe' },
-    { id: 2, type: 'bill', action: 'Bill generated', time: '4 hours ago', user: 'System' },
-    { id: 3, type: 'complaint', action: 'Complaint submitted', time: '6 hours ago', user: 'Jane Smith' },
-    { id: 4, type: 'payment', action: 'Payment received', time: '8 hours ago', user: 'Mike Johnson' },
-  ];
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
       currency: 'NGN',
       minimumFractionDigits: 0
     }).format(amount);
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'member': return <UserPlus className="w-4 h-4 text-blue-500" />;
-      case 'bill': return <FileText className="w-4 h-4 text-green-500" />;
-      case 'complaint': return <Bell className="w-4 h-4 text-orange-500" />;
-      case 'payment': return <DollarSign className="w-4 h-4 text-emerald-500" />;
-      default: return <Activity className="w-4 h-4 text-gray-500" />;
-    }
   };
 
   return (
@@ -177,7 +155,7 @@ const AdminDashboard = () => {
     <div>
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
               <p className="text-gray-600 mt-2">
-                Welcome back, {user?.name || 'Admin'}
+                Welcome back, {user?.firstName || 'Admin'}
               </p>
               <Badge variant="outline" className="mt-2">
                 {user?.cooperativeId ? 'Cooperative Admin' : 'System Admin'}
@@ -444,6 +422,11 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
+        {/* Contribution Section */}
+        <div className="mt-8 mb-4">
+          <ContributionSection />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Quick Actions */}
           <div className="lg:col-span-1">
@@ -459,6 +442,15 @@ const AdminDashboard = () => {
                     Invite New Member
                   </Link>
                 </Button>
+                {cooperativeAccount?.data === null && (
+                  <Button asChild variant="outline" className="w-full justify-start" >
+                    <Link to="/record-cooperative-account">
+                      <Banknote className="w-4 h-4 mr-2" />
+                      Set up your cooperative <br/> bank account 
+                    </Link>
+                  </Button>
+                  
+                )}
                 <Button asChild variant="outline" className="w-full justify-start">
                   <Link to="/pending-invites">
                     <Users className="w-4 h-4 mr-2" />
@@ -479,36 +471,7 @@ const AdminDashboard = () => {
 
           {/* Recent Activity */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest system activities and member actions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivities.map((activity: any) => (
-                    <div key={activity.id} className="flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        {getActivityIcon(activity.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">
-                          {activity.action}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          by <span className="font-bold">{activity.userName}</span> • {activity?.timestamp?.toLocaleString().split('T')[0]} 
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4">
-                  <Button variant="outline" className="w-full">
-                    View All Activities
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <RecentActivity />
           </div>
         </div>
 

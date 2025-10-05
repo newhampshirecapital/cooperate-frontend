@@ -18,11 +18,12 @@ import {
   Bell,
   UserPlus,
   PersonStanding,
-  BarChart3
+  BarChart3,
+  Target
   
 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
-import { useGetAllpendingInvitesQuery, useGetUserCooperativesQuery,  } from './api/api';
+import { useGetAllpendingInvitesQuery, useGetUserCooperativesQuery, useGetUserNotificationsQuery } from './api/api';
 import NotificationTab from './components/ui/notification-tab';
 
 interface LayoutProps {
@@ -37,6 +38,7 @@ export function Layout({ children }: LayoutProps) {
   const [showNotification, setShowNotification] = useState(true);
   const { data: pendingInvites } = useGetAllpendingInvitesQuery({id: user?.cooperateId || ''});
   const { data: cooperative } = useGetUserCooperativesQuery({id: user?._id || ''});
+  const { data: notifications } = useGetUserNotificationsQuery({id: user?._id || ''});
 
 
   
@@ -53,9 +55,12 @@ export function Layout({ children }: LayoutProps) {
     {id: 'complaint', label: 'Complaints', icon: MessageCircle, path: '/complaints' },
     {id: 'applications', label: 'Applications', icon: BellElectric, path: '/applications' },
     {id: 'notifications', label: 'Messages', icon: Bell, path: '/notifications' },
-    ...(user?.role === 'admin' ? [{ id: 'invite', label: 'Invite', icon: UserPlus, path: '/invite' }] : []),
+    {id: 'my-contributions', label: 'My Contributions', icon: CreditCard, path: '/my-contributions' },
+    ...(user?.role === 'admin' ? [{ id: 'invite member', label: 'Invite Member', icon: UserPlus, path: '/invite' }] : []),
     ...(user?.role === 'admin' ? [{ id: 'admin dashboard', label: 'Admin Dashboard', icon: BarChart3, path: '/admin-dashboard' }] : []),
-    ...(user?.role === 'admin' ? [{ id: 'pending invites', label: 'Pending Invites', icon: PersonStanding, path: '/pending-invites' }] : [])
+    ...(user?.role === 'admin' ? [{ id: 'pending invites', label: 'Pending Invites', icon: PersonStanding, path: '/pending-invites' }] : []),
+    ...(user?.role === 'admin' ? [{ id: 'savings-targets', label: 'Savings Targets', icon: Target, path: '/savings-targets' }] : []),
+    ...(user?.role === 'admin' ? [{ id: 'admin-contributions', label: 'All Contributions', icon: BarChart3, path: '/admin-contributions' }] : [])
   ];
 
   const handleNavigation = (path: string) => {
@@ -92,7 +97,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
             
             <div className="flex items-center space-x-4">
-              <span className="hidden sm:block text-sm text-gray-600">Welcome {user?.name}</span>
+              <span className="hidden sm:block text-sm text-gray-600">Welcome {user?.firstName}</span>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 sm:mr-2" />
                 <span className="hidden sm:inline">Logout</span>
@@ -124,7 +129,9 @@ export function Layout({ children }: LayoutProps) {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 const isPendingInvites = item.id === 'pending invites';
+                const isMessages = item.id === 'notifications';
                 const inviteCount = pendingInvites?.data?.length || 0;
+                const unreadMessages = notifications?.data?.filter((n: any) => !n.isRead).length || 0;
                 
                 return (
                   <li key={item.id}>
@@ -138,6 +145,11 @@ export function Layout({ children }: LayoutProps) {
                       {isPendingInvites && inviteCount > 0 && (
                         <Badge variant="destructive" className="ml-2 text-xs">
                           {inviteCount}
+                        </Badge>
+                      )}
+                      {isMessages && unreadMessages > 0 && (
+                        <Badge variant="destructive" className="ml-2 text-xs">
+                          {unreadMessages}
                         </Badge>
                       )}
                     </Button>

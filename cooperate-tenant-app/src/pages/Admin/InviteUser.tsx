@@ -16,7 +16,8 @@ const InviteUser = () => {
   // Form state
   const [formData, setFormData] = useState<InviteUserInput>({
     email: '',
-    name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
     role: 'member' as any,
     adminId: user?._id as string
@@ -45,10 +46,10 @@ const InviteUser = () => {
   const validateForm = (): boolean => {
     const newErrors: Partial<InviteUserInput> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'Name is required';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'Name must be at least 2 characters';
     }
 
     if (!formData.email.trim()) {
@@ -95,7 +96,8 @@ const InviteUser = () => {
       // Reset form
       setFormData({
         email: '',
-        name: '',
+        firstName: '',
+        lastName: '',
         phone: '',
         role: '' as unknown as UserRole,
         adminId: user?._id as string
@@ -134,22 +136,41 @@ const InviteUser = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Name Field */}
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Label htmlFor="firstName" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  Full Name
+                  First Name
                 </Label>
                 <Input
-                  id="name"
+                  id="firstName"
                   type="text"
-                  placeholder="Enter full name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
+                  placeholder="Enter first name"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  className={errors.firstName ? 'border-red-500 focus:border-red-500' : ''}
                 />
-                {errors.name && (
-                  <p className="text-sm text-red-600">{errors.name}</p>
+                {errors.firstName && (
+                  <p className="text-sm text-red-600">{errors.firstName}</p>
                 )}
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Last Name *
+                </Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Enter last name"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  className={errors.lastName ? 'border-red-500 focus:border-red-500' : ''}
+                />
+                {errors.lastName && (
+                  <p className="text-sm text-red-600">{errors.lastName}</p>
+                )}
+              </div>
+       
 
               {/* Email Field */}
               <div className="space-y-2">

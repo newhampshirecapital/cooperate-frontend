@@ -185,27 +185,7 @@ export const VirtualAccountDetails: React.FC<{
           </Button>
         </div>
 
-              {/* Bank Name */}
-              <div>
-                <p className="text-xs text-blue-100 mb-1">Bank</p>
-                <p className="font-semibold">{account.bankName || 'Not Available'}</p>
-              </div>
-
-              {/* Account Status */}
-              <div className="bg-white/10 rounded-lg p-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-blue-100 mb-1">Account Status</p>
-                    <p className="text-sm font-semibold text-green-300">Active & Verified</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-blue-100 mb-1">Member Since</p>
-                    <p className="text-sm font-semibold">
-                      {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              
 
               {/* Quick Actions Info */}
               <div className="bg-white/5 rounded-lg p-3">

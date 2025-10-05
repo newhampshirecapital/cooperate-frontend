@@ -72,7 +72,7 @@ export default function CreateVirtualAccount() {
       await createVirtualAccount({
         payload: {
           userId: user?._id || '',
-          userName: user?.name || '',
+          userName: user?.fullName || '',
           userEmail: user?.email || '',
           bvn: formData.bvn,
           nin: formData.nin,
@@ -142,7 +142,7 @@ export default function CreateVirtualAccount() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-blue-700 font-medium">Name:</span>
-                    <span className="ml-2">{user?.name}</span>
+                    <span className="ml-2">{user?.fullName}</span>
                   </div>
                   <div>
                     <span className="text-blue-700 font-medium">Email:</span>

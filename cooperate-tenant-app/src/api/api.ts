@@ -19,6 +19,10 @@ import type {
   UpdateUserInviteStatusPayload,
   SendMessagePayload,
   CreateVirtualAccountPayload,
+  RecordCooperativeAccountPayload,
+  CreateSavingsTargetPayload,
+  ContributeToSavingsTargetPayload,
+  CancelSavingsTargetPayload,
 } from "../interface/auth";
 import { secureTokenStorage } from "../lib/secureStorage";
 
@@ -408,9 +412,10 @@ export const API = createApi({
 
 
       //activity
-      getRecentActivity:builder.query<ApiResponse<any>, {id:string, days?:number, limit?:number}>({
-        query:({id, days = 7, limit = 100})=>({
-          url:`coop-log/${id}/recent?days=${days}&limit=${limit}`,
+      getRecentActivity:builder.query<ApiResponse<any>, {id:string}>({
+        query:({id})=>({
+          url:`coop-log/${id}/all`,
+          method: "GET",
         })
       }),
 
@@ -430,12 +435,107 @@ export const API = createApi({
       }),
 
       //wallet
-      getWalletBalance:builder.query<ApiResponse<any>, {id:string}>({
+      getWalletBalance:builder.query<any, {id:string}>({
         query: ({id}) => ({
           url: `wallet/user/${id}/balance`,
           method: "GET",
         }),
       }),
+      recordCooperativeAccount:builder.mutation<ApiResponse<any>, {payload:RecordCooperativeAccountPayload}>({
+        query: ({payload}) => ({
+          url: `admin/record-cooperate-account`,
+          method: "POST",
+          body: payload,
+        }),
+      }),
+      
+      getBanksList:builder.query<any, void>({
+        query: () => ({
+          url: `payment/banks-list`,
+          method: "GET",
+        }),
+      }),
+      getCooperativeAccount:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `admin/get-cooperative-account/${id}`,
+          method: "GET",
+        }),
+      }),
+
+      createSavingsTarget:builder.mutation<ApiResponse<any>, {payload:CreateSavingsTargetPayload}>({
+        query: ({payload}) => ({
+          url: `admin/create-savings-target`,
+          method: "POST",
+          body: payload,
+        }),
+      }),
+      listSavingsTargets:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `admin/list-savings-targets/${id}`,
+          method: "GET",
+        }),
+      }),
+
+      //contribution
+      contributeToSavingsTarget:builder.mutation<ApiResponse<any>, {payload:ContributeToSavingsTargetPayload, id:string}>({
+        query: ({payload, id}) => ({
+          url: `payment/contribute/${id}`,
+          method: "POST",
+          body: payload,
+        }),
+      }),
+
+      //admin only
+      cancelSavingsTarget:builder.mutation<ApiResponse<any>, {payload:CancelSavingsTargetPayload}>({
+        query: ({payload}) => ({
+          url: `admin/cancel-savings-target`,
+          method: "PUT",
+          body: payload,
+        }),
+      }),
+
+      //payment also for admin view
+      getSavingsTargetPayment:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `payment/contributions/savings-target/${id}`,
+          method: "GET",
+        }),
+      }),
+      //this is for admin view
+      getSavingTargetStats:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `payment/contributions/savings-target/${id}/stats`,
+          method: "GET",
+        }),
+      }),
+
+      //for all users use this to replace the transactions history data
+      getUserTransactionHistory:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `wallet/history/${id}`,
+          method: "GET",
+        }),
+      }),
+      //get user contributions both for admin and user
+      getUserContributions:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `payment/contributions/user/${id}`,
+          method: "GET",
+        }),
+      }),
+      //admin only
+      getCooperativeContributions:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `payment/contributions/cooperative/${id}`,
+          method: "GET",
+        }),
+      }),
+      getTransactionDetails:builder.query<ApiResponse<any>, {id:string}>({
+        query: ({id}) => ({
+          url: `wallet/transaction/${id}`,
+          method: "GET",
+        }),
+      })
      
 
       
@@ -509,5 +609,24 @@ export const {
 
   //wallet
   useGetWalletBalanceQuery,
+  
+  //payment
+  useGetBanksListQuery,
+  useRecordCooperativeAccountMutation,
+  useGetCooperativeAccountQuery,
 
+  //savings target
+  useCreateSavingsTargetMutation,
+  useListSavingsTargetsQuery,
+
+  //contribution
+  useContributeToSavingsTargetMutation,
+  useCancelSavingsTargetMutation,
+  //payment
+  useGetSavingsTargetPaymentQuery,
+  useGetSavingTargetStatsQuery,
+  useGetUserTransactionHistoryQuery,
+  useGetUserContributionsQuery,
+  useGetCooperativeContributionsQuery,
+  useGetTransactionDetailsQuery,
 } = API;

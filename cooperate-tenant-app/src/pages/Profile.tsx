@@ -24,7 +24,9 @@ import { PasswordChangeModal } from '../components/modal/PasswordChangeModal';
 
 export interface User {
     _id: string;
-    name: string;
+    firstName?: string;
+    lastName?: string;
+    fullName?: string;
     email: string;
     phone: string;
     role?: 'admin' | 'member';
@@ -51,7 +53,9 @@ export function ProfilePage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: userData?.name || '',
+    firstName: userData?.firstName || '',
+    lastName: userData?.lastName || '',
+    fullName: userData?.fullName || '',
     email: userData?.email || '',
     phone: userData?.phone || '',
     address: {
@@ -83,7 +87,9 @@ export function ProfilePage() {
     updateUserMutation({ 
       id: userData._id, 
       payload: {
-        name: formData.name,
+        firstName: formData.firstName || '',
+        lastName: formData.lastName || '',
+        fullName: formData.fullName || '',
         email: formData.email,
         phone: formData.phone,
         address: formData.address
@@ -100,7 +106,9 @@ export function ProfilePage() {
   const handleCancel = () => {
     setIsEditing(false);
     setFormData({
-      name: userData?.name || '',
+      firstName: userData?.firstName || '',
+      lastName: userData?.lastName || '',
+      fullName: userData?.fullName || '',
       email: userData?.email || '',
       phone: userData?.phone || '',
       address: {
@@ -185,11 +193,11 @@ export function ProfilePage() {
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center text-white text-xl font-semibold">
-                  {userData?.name?.charAt(0) || 'U'}
+                  {userData?.fullName?.charAt(0) || 'U'}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold">{userData?.name}</h3>
+                    <h3 className="font-semibold">{userData?.fullName}</h3>
                     <Badge variant="secondary" className="text-xs">
                       {userData?.role === 'admin' ? 'Administrator' : 'Member'}
                     </Badge>
@@ -206,17 +214,46 @@ export function ProfilePage() {
                   {isEditing ? (
                     <Input
                       id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                     />
                   ) : (
                     <div className="flex items-center gap-2 p-2">
                       <User className="w-4 h-4 text-gray-400" />
-                      <span>{userData?.name}</span>
+                      <span>{userData?.fullName}</span>
                     </div>
                   )}
                 </div>
-                
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  {isEditing ? (
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 p-2">
+                      <User className="w-4 h-4 text-gray-400" />
+                      <span>{userData?.firstName}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  {isEditing ? (
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 p-2">
+                      <User className="w-4 h-4 text-gray-400" />
+                      <span>{userData?.lastName}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   {isEditing ? (

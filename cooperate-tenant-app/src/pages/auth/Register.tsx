@@ -19,7 +19,8 @@ export function RegisterPage() {
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registerMutation, { isLoading, error: registerError }] = useRegisterMutation();
@@ -52,7 +53,7 @@ export function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password || !confirmPassword || !name || !phone) {
+    if (!email || !password || !confirmPassword || !firstName || !lastName || !phone) {
       toast.error('Please fill in all fields');
       return;
     }
@@ -69,7 +70,7 @@ export function RegisterPage() {
 
     try {
     
-      const result: any = await registerMutation({ email, password, name, phone }).unwrap();
+      const result: any = await registerMutation({ email, password, firstName, lastName, phone }).unwrap();
       
       if (result?.success === true) {
         toast.success('Registration successful! Please verify your email.');
@@ -143,20 +144,32 @@ export function RegisterPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="firstName">First Name</Label>
               <Input
-                id="name"
+                id="firstName"
                 type="text"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your first name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                disabled={isLoading}
               />
               {error && <p className="text-red-500">{error.message}</p>}
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                type="text"
+                placeholder="Enter your last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+               disabled={isLoading}
+              />
+              {error && <p className="text-red-500">{error.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 type="email"
@@ -232,6 +245,7 @@ export function RegisterPage() {
             
               <Button type="submit" className="w-full cursor-pointer hover:bg-blue-900" disabled={isLoading}
               >
+                  
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>

@@ -117,7 +117,7 @@ const VirtualAccountModal: React.FC<VirtualAccountModalProps> = ({
               {/* Action Buttons */}
               <div className="space-y-2 md:space-y-4 pt-1 md:pt-6">
                 <Button 
-                  className="w-full bg-gradient-To-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transform hover:scale-105 transition-all duration-200 py-6 text-lg font-semibold rounded-xl"
+                  className="w-full bg-gradient-To-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-black shadow-lg transform hover:scale-105 transition-all duration-200 py-6 text-lg font-semibold rounded-xl"
                   onClick={ handleCreateVirtualAccount}
                 >
                   Create Virtual Account

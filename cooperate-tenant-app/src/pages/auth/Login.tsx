@@ -61,7 +61,7 @@ export function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 type="email"
@@ -100,8 +100,8 @@ export function LoginPage() {
             </Button>
           </form>
           
-          <div className="mt-6 text-center space-y-2">
-            <Button onClick={() => navigate('/forgot-password')} className="text-sm text-primary hover:underline">
+          <div className="mt-6 text-center text-white space-y-2">
+            <Button onClick={() => navigate('/forgot-password')} className="text-sm text-white  hover:underline">
               Forgot your password?
             </Button>
             
@@ -116,7 +116,7 @@ export function LoginPage() {
             </div> */}
             <div className="text-sm text-gray-600">
               Not yet a member? request for membership{' '}
-              <Button onClick={() => navigate('/request-membership')} className="text-primary hover:underline">
+              <Button onClick={() => navigate('/request-membership')} className="text-white hover:underline">
                 here
               </Button>
             </div>

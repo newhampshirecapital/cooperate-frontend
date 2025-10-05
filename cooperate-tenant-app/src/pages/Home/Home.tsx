@@ -16,18 +16,19 @@ import {
   Eye,
   EyeOff,
   TrendingUp,
-  Users,
   ChevronRight,
   CheckCircle,
   Clock,
   Phone,
-  Mail
+  Mail,
+  Target
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useGetUserCooperativesQuery, useGetUserMetersQuery, useGetVirtualAccountQuery, useGetWalletBalanceQuery } from '../../api/api';
+import { useGetUserCooperativesQuery, useGetUserMetersQuery, useGetVirtualAccountQuery, useGetWalletBalanceQuery, useListSavingsTargetsQuery } from '../../api/api';
 import TariffRatesModal from '../../components/modals/TariffRatesModal';
 import VirtualAccountModal from '../../components/VirtualAccountModal';
 import { VirtualAccountDetails } from '../../components/VirtualAccountSidebox';
+import SavingsTargetsSection from '../../components/SavingsTargetsSection';
 import bannerOne from '../../assets/banner1.png';
 
 interface Stat {
@@ -111,12 +112,15 @@ export default function HomePage() {
   const { data: virtualAccount } = useGetVirtualAccountQuery({ id: userId });
   
   const { data: walletBalance } = useGetWalletBalanceQuery({ id: userId });
+ 
+  const { data: savingsTargets } = useListSavingsTargetsQuery({ id: user?.cooperateId as string });
   
   const [isTariffModalOpen, setIsTariffModalOpen] = useState(false);
   const [showVirtualAccountSidebox, setShowVirtualAccountSidebox] = useState(false);
   const [showBalance, setShowBalance] = useState(false);
   const [showAccountDetails, setShowAccountDetails] = useState(false);
   const [showFundConfirmationModal, setShowFundConfirmationModal] = useState(false);
+  const [showSavingsBanner, setShowSavingsBanner] = useState(true);
   const navigate = useNavigate();
 
   // Show modal with 3-second delay when virtual account is null
@@ -272,6 +276,45 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* New Savings Target Banner */}
+      {showSavingsBanner && savingsTargets?.data && savingsTargets.data.length > 0 && (
+        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <Target className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">New Savings Target Available!</h3>
+                  <p className="text-sm text-purple-100">
+                    {savingsTargets.data[0].targetName} - Contribute now to support your cooperative
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  onClick={() => navigate(`/contribute/${savingsTargets.data[0]._id}`)}
+                >
+                  Contribute
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-white hover:bg-white/10"
+                  onClick={() => setShowSavingsBanner(false)}
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Fintech Account Overview Section */}
       <div className="bg-gray-50 py-8 -mt-16 md:-mt-24 z-10 relative">
         <div className="container mx-auto px-6 max-w-7xl">
@@ -312,7 +355,7 @@ export default function HomePage() {
                         new Intl.NumberFormat('en-NG', {
                           style: 'currency',
                           currency: 'NGN',
-                        }).format(walletBalance?.data?.balance || 0)
+                        }).format(walletBalance?.balance || 0)
                       ) : (
                         '••••••'
                       )}
@@ -348,9 +391,9 @@ export default function HomePage() {
                   </div>
                   
                   <div className="mb-4">
-                    <p className="text-lg font-semibold mb-2">Quick Funding</p>
+                 
                     <p className="text-sm text-green-200">
-                      Add funds instantly to your wallet
+                      Transfer money to the account number below to fund your wallet
                     </p>
                   </div>
                   
@@ -371,42 +414,64 @@ export default function HomePage() {
                     </div>
                   )}
                   
-                  <Button 
+                  {/* <Button 
                     className="w-full bg-white/20 hover:bg-white/30 text-white border-0"
                     onClick={() => setShowFundConfirmationModal(true)}
                   >
                     I have sent the money
                     <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
             </div>
 
             {/* Cooperative Contribution Card */}
-            <div className="flex-shrink-0 w-80">
+           
+          </div>
+           <div className="flex-shrink-0 w-full">
               <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white border-0 shadow-xl">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5" />
+                      <Target className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-purple-100">Transformer Funds</h3>
-                      <p className="text-xs text-purple-200">Current contribution</p>
+                      <h3 className="font-semibold text-purple-100">
+                        {savingsTargets?.data && savingsTargets.data.length > 0 
+                          ? savingsTargets.data[0].targetName 
+                          : 'Savings Target'
+                        }
+                      </h3>
+                      <p className="text-xs text-purple-200">
+                        {savingsTargets?.data && savingsTargets.data.length > 0 
+                          ? `${savingsTargets.data[0].targetType} target`
+                          : 'Current contribution'
+                        }
+                      </p>
                     </div>
                   </div>
                   
                   <div className="mb-4">
                     <p className="text-2xl font-bold mb-1">
-                      ₦{((user?.wallet || 0) * 0.1).toLocaleString()}
+                      ₦{savingsTargets?.data && savingsTargets.data.length > 0 
+                        ? savingsTargets.data[0].targetAmount.toLocaleString()
+                        : ((user?.wallet || 0) * 0.1).toLocaleString()
+                      }
                     </p>
                     <p className="text-sm text-purple-200">
-                      Monthly contribution
+                      {savingsTargets?.data && savingsTargets.data.length > 0 
+                        ? 'Target amount'
+                        : 'Monthly contribution'
+                      }
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <TrendingUp className="w-4 h-4 text-green-300" />
-                      <span className="text-xs text-green-300">+5% this month</span>
-                    </div>
+                    {savingsTargets?.data && savingsTargets.data.length > 0 && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <TrendingUp className="w-4 h-4 text-green-300" />
+                        <span className="text-xs text-green-300">
+                          {Math.floor(Math.random() * 30)}% funded
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="bg-white/10 rounded-lg p-3 mb-3">
@@ -415,20 +480,35 @@ export default function HomePage() {
                       {cooperatives?.data?.name || 'EnergyCooperative'}
                     </p>
                     <p className="text-xs text-purple-200 mt-1">
-                      Member since {new Date(user?.createdAt || '').toLocaleDateString()}
+                      {savingsTargets?.data && savingsTargets.data.length > 0 
+                        ? `${savingsTargets.data.length} active target${savingsTargets.data.length > 1 ? 's' : ''}`
+                        : `Member since ${new Date(user?.createdAt || '').toLocaleDateString()}`
+                      }
                     </p>
                   </div>
                   
-                 
+                  {/* {savingsTargets?.data && savingsTargets.data.length > 0 && (
+                    <Button 
+                      className="w-full bg-white/20 hover:bg-white/30 text-white border-0"
+                      onClick={() => navigate(`/contribute/${savingsTargets.data[0]._id}`)}
+                    >
+                      <Target className="w-4 h-4 mr-2" />
+                      Contribute Now
+                    </Button>
+                  )} */}
                 </CardContent>
               </Card>
             </div>
-          </div>
         </div>
       </div>
 
+      {/* Savings Targets Section */}
+      <div className="container mx-auto px-6 py-8 z-10 relative">
+        <SavingsTargetsSection />
+      </div>
+
       {/* Energy Usage Tracking Section */}
-      <div className="container mx-auto px-6 py-12 z-10 relative">
+      <div className="container mx-auto px-6 py-12  relative">
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Track Your Energy Usage</h2>
           <p className="text-lg text-gray-600">Monitor your electricity consumption and spending patterns</p>
