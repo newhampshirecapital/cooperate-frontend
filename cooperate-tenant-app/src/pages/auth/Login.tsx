@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Zap, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -101,11 +102,11 @@ export function LoginPage() {
           </form>
           
           <div className="mt-6 text-center text-white space-y-2">
-            <Button onClick={() => navigate('/forgot-password')} className="text-sm text-white  hover:underline">
+            <button onClick={() => navigate('/forgot-password')} className="text-sm text-primary  hover:underline">
               Forgot your password?
-            </Button>
+            </button>
             
-            {/* <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link
                 to="/register"
@@ -113,12 +114,12 @@ export function LoginPage() {
               >
                 Sign up
               </Link>
-            </div> */}
+            </div>
             <div className="text-sm text-gray-600">
               Not yet a member? request for membership{' '}
-              <Button onClick={() => navigate('/request-membership')} className="text-white hover:underline">
+              <button onClick={() => navigate('/request-membership')} className="text-primary hover:underline">
                 here
-              </Button>
+              </button>
             </div>
           </div>
         </CardContent>
